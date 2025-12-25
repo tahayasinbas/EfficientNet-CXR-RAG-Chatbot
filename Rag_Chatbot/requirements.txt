@@ -1,0 +1,10 @@
+psycopg2~=2.9.10
+psycopg2-binary~=2.9.11
+torch~=2.6.0+cu124
+python-dotenv~=1.2.1
+langchain-google-genai~=3.2.0
+langchain-core~=1.1.0
+langchain-community~=0.4.1
+langsmith~=0.4.53
+tqdm~=4.67.1
+langchain-text-splitters~=1.0.0

@@ -1,0 +1,75 @@
+# Python
+*.py[cod]
+*$py.class
+*.so
+__pycache__/
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+/media/
+/static/
+*.pot
+
+# Environment variables
+.env
+*.env
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Model files
+*.h5
+*.pkl
+*.pth
+*.onnx
+*.pt
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Database
+*.sqlite3
+*.db
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Rag_Chatbot specific
+Rag_Chatbot/pg_data/
+Rag_Chatbot/.env
+
+# Frontend (additional to frontend/.gitignore)
+frontend/node_modules/
+frontend/build/
+frontend/.env
+
+# Test files
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+.cache/

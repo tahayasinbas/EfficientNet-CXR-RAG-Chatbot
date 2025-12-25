@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  db:
+    image: pgvector/pgvector:pg16  # İçinde vektör eklentisi hazır gelen özel versiyon
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=admin        # Kullanıcı adı
+      - POSTGRES_PASSWORD=sifre123 # Şifre (Bunu değiştirebilirsin)
+      - POSTGRES_DB=rag_db         # Veritabanı adı
+    volumes:
+      - ./pg_data:/var/lib/postgresql/datadocker-compose up -d # Veriler kaybolmasın diye klasöre kaydet
