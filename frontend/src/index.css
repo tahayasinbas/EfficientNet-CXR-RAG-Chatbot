@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Shadcn ve Özel Tasarım Belirteçleri */
+@layer base {
+  :root {
+    /* Açık Tema Renkleri */
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #f8fafc;
+    --color-bg-tertiary: #f1f5f9;
+    --color-surface: #ffffff;
+    --color-surface-elevated: #f8fafc;
+
+    --color-text-primary: #020817;
+    --color-text-secondary: #334155;
+    --color-text-tertiary: #64748b;
+    --color-text-disabled: #94a3b8;
+    --color-text-accent: #1d4ed8;
+
+    --color-border-light: #e2e8f0;
+    --color-border-default: #cbd5e1;
+    --color-border-strong: #94a3b8;
+
+    /* Açık Tema Shadcn Değişkenleri */
+    --background: 0 0% 100%;
+    --foreground: 224 71.4% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 215 27.9% 95.5%;
+    --secondary-foreground: 224 71.4% 4.1%;
+    --muted: 215 27.9% 95.5%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 215 27.9% 95.5%;
+    --accent-foreground: 224 71.4% 4.1%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 215 20.2% 85.7%;
+    --input: 215 20.2% 85.7%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.75rem;
+    --shadow-color: 220 3.8% 39.2%;
+    --grid-pattern-color: rgba(30, 64, 175, 0.1);
+  }
+
+  .dark {
+    /* Koyu Tema Renkleri */
+    --color-bg-primary: #020817;
+    --color-bg-secondary: #0f172a;
+    --color-bg-tertiary: #1e293b;
+    --color-surface: #0f172a;
+    --color-surface-elevated: #1e293b;
+
+    --color-text-primary: #f8fafc;
+    --color-text-secondary: #cbd5e1;
+    --color-text-tertiary: #94a3b8;
+    --color-text-disabled: #475569;
+    --color-text-accent: #60a5fa;
+    
+    --color-border-light: #1e293b;
+    --color-border-default: #334155;
+    --color-border-strong: #475569;
+
+    /* Koyu Tema Shadcn Değişkenleri */
+    --background: 224 71.4% 4.1%;
+    --foreground: 210 40% 98%;
+    --card: 224 71.4% 4.1%;
+    --card-foreground: 210 40% 98%;
+    --popover: 224 71.4% 4.1%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 215 27.9% 16.9%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 215 27.9% 16.9%;
+    --muted-foreground: 215.4 16.3% 56.9%;
+    --accent: 215 27.9% 16.9%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --ring: 217.2 91.2% 59.8%;
+    --shadow-color: 220 3.8% 9.2%;
+    --grid-pattern-color: rgba(255, 255, 255, 0.05);
+    }
+  }
+  
+  /* Özel Kaydırıcı Stilleri */
+  @layer base {
+    .slider-thumb::-webkit-slider-thumb {
+      @apply appearance-none w-4 h-4 bg-white rounded-full shadow-md cursor-pointer transition-transform duration-200 ease-out;
+      @apply ring-2 ring-medical-blue;
+    }
+    .slider-thumb:hover::-webkit-slider-thumb {
+      @apply scale-110;
+    }
+    .slider-thumb::-moz-range-thumb {
+      @apply appearance-none w-4 h-4 bg-white rounded-full shadow-md cursor-pointer;
+      @apply ring-2 ring-medical-blue;
+    }
+  }
+  
+  
+
+/* Global Stiller */
+@layer base {
+  * {
+    @apply border-border-default;
+  }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    @apply bg-bg-secondary text-text-primary antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  }
+
+  #root {
+    height: 100%;
+    overflow: hidden;
+  }
+}
+
+/* Özel Kaydırma Çubuğu */
+@layer utilities {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-bg-tertiary;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border-default rounded-lg border-2 border-solid border-bg-tertiary;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-border-strong;
+  }
+}
+
+/* Profesyonel Kart Efektleri */
+@layer components {
+  .card-surface {
+    @apply bg-surface border shadow-card rounded-xl transition-shadow transition-colors;
+  }
+  .card-surface-hover {
+    @apply bg-surface border shadow-card-hover rounded-xl transition-all duration-200 hover:border-medical-blue;
+  }
+  .card-elevated {
+    @apply bg-surface-elevated border shadow-card-elevated rounded-xl;
+  }
+}
+
+/* Odak İyileştirmeleri */
+@layer base {
+  *:focus-visible {
+    @apply outline-none ring-2 ring-offset-2 ring-ring ring-offset-bg-primary;
+  }
+}
+

@@ -1,0 +1,36 @@
+/* AI-XRAY ASSIST - App Styles */
+
+.App {
+  min-height: 100vh;
+}
+
+/* Range Slider Custom Styling */
+input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+input[type='range']::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+/* Smooth Animations */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Radial Gradient for Landing Page */
+.bg-gradient-radial {
+  background: radial-gradient(circle, var(--tw-gradient-stops));
+}
