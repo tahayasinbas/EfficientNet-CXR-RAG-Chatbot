@@ -64,6 +64,11 @@ Göğüs röntgeni görüntülerini yapay zeka ile analiz eden ve tıbbi doküma
 - **Real-time Analiz**: Canlı sonuç görüntüleme
 - **Görsel Raporlama**: Grafik ve chart'larla sonuç sunumu
 - **Geçmiş Kayıtlar**: Tüm analizlerin saklanması ve görüntülenmesi
+### Arayüz Fotoları 
+<img width="946" height="548" alt="image" src="https://github.com/user-attachments/assets/6b63ad9a-deb1-4cb9-a1e3-656b2a14a88f" />
+
+<img width="963" height="522" alt="image" src="https://github.com/user-attachments/assets/11672589-40f2-494a-90b7-e3993dcb04a6" />
+
 
 ## 📊 Model Performansı
 
@@ -1008,3 +1013,4 @@ Bu proje eğitim amaçlıdır. Ticari kullanım için lütfen lisans alın.
 **Son Güncelleme**: 25 Aralık 2025
 **Versiyon**: 1.0.0
 **Geliştirici**: KDS Ekibi
+
