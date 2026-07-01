@@ -92,10 +92,10 @@ DATABASES = {
     'rag_db': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('POSTGRES_DB', 'rag_db'),
-        'USER': os.getenv('POSTGRES_USER', 'admin'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'sifre123'),
+        'USER': os.getenv('POSTGRES_USER', 'postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'your_password'),
         'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
-        'PORT': os.getenv('POSTGRES_PORT', '5433'),
+        'PORT': os.getenv('POSTGRES_PORT', '5410'),
     }
 }
 
@@ -167,9 +167,18 @@ REST_FRAMEWORK = {
 
 # RAG Chatbot Configuration
 RAG_CHATBOT_CONFIG = {
-    'CONNECTION_STRING': f"postgresql://{os.getenv('POSTGRES_USER', 'admin')}:{os.getenv('POSTGRES_PASSWORD', 'sifre123')}@{os.getenv('POSTGRES_HOST', 'localhost')}:{os.getenv('POSTGRES_PORT', '5433')}/{os.getenv('POSTGRES_DB', 'rag_db')}",
-    'COLLECTION_NAME': 'makaleler_vectors',
-    'MODEL_NAME': 'BAAI/bge-m3',
+    'DB_HOST':     os.getenv('POSTGRES_HOST', 'localhost'),
+    'DB_PORT':     int(os.getenv('POSTGRES_PORT', '5410')),
+    'DB_USER':     os.getenv('POSTGRES_USER', 'postgres'),
+    'DB_PASSWORD': os.getenv('POSTGRES_PASSWORD', 'your_password'),
+    'DB_NAME':     os.getenv('POSTGRES_DB', 'rag_db'),
+    'TABLE_NAME':  'pdf_chunks',
+    'EMBED_DIM':   1536,
     'GEMINI_MODEL': 'gemini-2.5-flash',
     'GEMINI_TEMPERATURE': 0.4,
+    'SEMANTIC_TOP_K': 20,
+    'KEYWORD_TOP_K':  20,
+    'FINAL_TOP_K':    10,
+    'RRF_K':  60,
+    'ALPHA':  0.5,
 }

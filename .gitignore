@@ -28,6 +28,8 @@ db.sqlite3-journal
 *.swp
 *.swo
 *~
+media/
+
 
 # OS
 .DS_Store
