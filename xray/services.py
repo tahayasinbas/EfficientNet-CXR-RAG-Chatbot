@@ -13,7 +13,7 @@ import numpy as np
 
 # Add model directory to path
 BASE_DIR = Path(__file__).resolve().parent.parent
-model_dir = str(BASE_DIR / 'model')
+model_dir = str(BASE_DIR / 'egitim-dosyalari')
 if model_dir not in sys.path:
     sys.path.insert(0, model_dir)
 
