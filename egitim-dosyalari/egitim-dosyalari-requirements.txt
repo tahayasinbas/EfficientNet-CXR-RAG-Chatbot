@@ -1,0 +1,45 @@
+# Model eğitimi ve hakem-yanıtı analizleri için bağımlılıklar
+# (kök dizindeki requirements.txt web uygulaması içindir — bu ondan AYRIDIR)
+#
+# Kurulum:
+#     pip install -r egitim-dosyalari/requirements.txt
+#
+# Not: Makaledeki sonuçlar Kaggle'ın T4 GPU imajında üretilmiştir; aşağıdaki
+# alt sınırlar yerel olarak doğrulanmış sürümlerdir. CUDA'lı bir torch için
+# https://pytorch.org adresindeki kurulum komutunu kullanın.
+
+# ── Çekirdek ──
+torch>=2.5.0
+torchvision>=0.20.0
+numpy>=1.26.0
+pandas>=2.0.0
+scikit-learn>=1.3.0          # GroupShuffleSplit, ROC/AP metrikleri, IsotonicRegression
+tqdm>=4.65.0
+
+# ── Görüntü işleme / augmentation ──
+Pillow>=10.0.0
+opencv-python-headless>=4.8.0
+albumentations>=1.3.0,<2.0   # dataset.py API'si 1.x'e göre yazıldı (var_limit, max_holes)
+
+# ── Figürler ──
+matplotlib>=3.7.0
+seaborn>=0.13.0              # 05_evaluate.py confusion matrix ısı haritaları
+
+# ── Opsiyonel, belirli script'ler için ──
+thop>=0.1.1                  # 07_model_profiling.py — FLOPs (Tablo 6). Yoksa script
+                             # çalışır ama FLOPs sütunu boş kalır.
+python-docx>=1.1.0           # 12_build_revised_docx.py — makale Word çıktısı.
+                             # Sadece makaleyi yeniden üretmek için gerekir.
+
+# ── Hangi script neye ihtiyaç duyar ──
+# 01_data_preparation.py      : pandas, scikit-learn, numpy
+# 04_train.py                 : torch, torchvision, scikit-learn, numpy, tqdm
+# 05_evaluate*.py             : + matplotlib, seaborn, albumentations, Pillow
+# 06_calibration_and_*.py     : pandas, numpy, scikit-learn, matplotlib
+# 07_model_profiling.py       : torch, torchvision, (thop)
+# 08_gradcam_visualization.py : torch, matplotlib, Pillow, opencv
+# 09_tta_significance_test.py : pandas, numpy, scikit-learn
+# 10/11_*figure*.py           : matplotlib
+# 12_build_revised_docx.py    : python-docx, Pillow
+# 13_decision_curve_*.py      : pandas, numpy, scikit-learn, matplotlib
+# run_ablations.py            : yukarıdakilerin tümü (04 ve 05'i içeri aktarır)
