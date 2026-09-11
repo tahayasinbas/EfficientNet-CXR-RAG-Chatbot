@@ -1,0 +1,16 @@
+disease,prevalence,max_nb_gain,pt_at_max_gain,clinically_useful,pt_useful_low,pt_useful_high,nb_model_at_prev,nb_treat_all_at_prev,nb_gain_at_prev,net_tp_per_1000_at_prev,cal_max_nb_gain,cal_pt_at_max_gain,cal_clinically_useful,cal_pt_useful_low,cal_pt_useful_high,cal_net_tp_per_1000_at_max
+No Finding,0.5407,0.23272,0.541,True,0.287,0.7,0.23284,0.0,0.23284,232.8,0.25024,0.541,True,0.167,0.7,250.2
+Infiltration,0.1773,0.0,0.001,False,,,0.0,0.0,0.0,0.0,0.0577,0.178,True,0.051,0.437,57.7
+Effusion,0.1168,0.0007,0.117,False,,,0.0007,0.0,0.0007,0.7,0.07087,0.117,True,0.012,0.7,70.9
+Atelectasis,0.1008,0.0,0.001,False,,,0.0,0.0,0.0,0.0,0.04896,0.103,True,0.015,0.504,49.0
+Nodule,0.0561,0.0,0.001,False,,,0.0,0.0,0.0,0.0,0.02307,0.057,True,0.019,0.407,23.1
+Pneumothorax,0.0479,4e-05,0.047,False,,,4e-05,0.0,4e-05,0.0,0.03035,0.051,True,0.006,0.397,30.3
+Consolidation,0.0442,0.0,0.001,False,,,0.0,0.0,0.0,0.0,0.02109,0.044,True,0.01,0.155,21.1
+Mass,0.0436,0.0,0.001,False,,,0.0,0.0,0.0,0.0,0.02342,0.044,True,0.009,0.472,23.4
+Pleural_Thickening,0.0307,0.0,0.001,False,,,0.0,0.0,0.0,0.0,0.01502,0.031,True,0.011,0.192,15.0
+Cardiomegaly,0.0284,0.0,0.028,False,,,1e-05,0.0,1e-05,0.0,0.01897,0.028,True,0.005,0.449,19.0
+Emphysema,0.0271,1e-05,0.027,False,,,1e-05,0.0,1e-05,0.0,0.01921,0.027,True,0.004,0.483,19.2
+Edema,0.0191,0.0,0.019,False,,,0.0,0.0,0.0,0.0,0.01218,0.019,True,0.003,0.15,12.2
+Fibrosis,0.0159,0.0,0.001,False,,,0.0,0.0,0.0,0.0,0.00719,0.016,True,0.006,0.099,7.2
+Pneumonia,0.012,0.0,0.001,False,,,0.0,0.0,0.0,0.0,0.00486,0.012,True,0.006,0.04,4.9
+Hernia,0.0019,0.0,0.002,False,,,0.0,0.0,0.0,0.0,0.00096,0.002,False,,,1.0
