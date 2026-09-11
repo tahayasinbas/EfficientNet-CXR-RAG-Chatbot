@@ -1,0 +1,838 @@
+-rw-r--r-- 1 root root  5416 Nov 29 10:24 /kaggle/working/01_data_preparation_official_split.py
+-rw-r--r-- 1 root root  8874 Nov 29 10:24 /kaggle/working/01_data_preparation.py
+-rw-r--r-- 1 root root 17233 Nov 29 10:24 /kaggle/working/04_train.py
+-rw-r--r-- 1 root root 10295 Nov 29 10:24 /kaggle/working/05_evaluate.py
+-rw-r--r-- 1 root root  7937 Nov 29 10:24 /kaggle/working/05_evaluate_with_tta.py
+-rw-r--r-- 1 root root 12736 Nov 29 10:24 /kaggle/working/06_gradio_app.py
+-rw-r--r-- 1 root root  4582 Nov 29 10:24 /kaggle/working/check_multi_gpu_config.py
+-rw-r--r-- 1 root root  8876 Nov 29 10:24 /kaggle/working/config.py
+-rw-r--r-- 1 root root 14179 Nov 29 10:24 /kaggle/working/dataset.py
+-rw-r--r-- 1 root root 10031 Nov 29 10:24 /kaggle/working/model.py
+-rw-r--r-- 1 root root 17403 Nov 29 10:24 /kaggle/working/run_kaggle.py
+======================================================================
+GÖĞÜS HASTALIKLARI KDS SİSTEMİ (112K - EfficientNet-B3 v16.0 FINAL)
+======================================================================
+📊 112,120 görüntü (TÜM DATASET)
+🏗️  Model: EfficientNet-B3 (12M params - %32 daha güçlü!)
+🎯 Hedef AUC: 0.85+ (B3 optimal resolution!)
+⏱️  Tahmini süre: ~6.9 saat (eğitim) + 1.0 saat (TTA) = 8.2 saat
+📏 Image Size: 300×300 (B3 OPTIMAL! Nodule/Mass daha iyi!)
+🔧 Batch Size: 36 (gerçek veri: BS36 çalışıyor!)
+🔧 Epochs: 18 (23dk/epoch → 8.2h, marj 3.8h!)
+🔧 Augmentation: MEDIUM + TTA
+🔧 Dropout: 0.55 (Dengeli regularization)
+🔧 NUM_WORKERS: 4 (Kaggle T4 optimal)
+🔧 Freeze: 2 epoch (B3 hızlı öğrenir)
+🔧 Early Stop: patience=9 (18 epoch için)
+🔧 Patient-Level Split: ✅
+🔧 TTA: ✅ OTOMATİK
+======================================================================
+
+📁 Python dosyaları kontrol ediliyor...
+✓ config.py
+✓ model.py
+✓ dataset.py
+✓ 01_data_preparation.py
+✓ 04_train.py
+✓ 05_evaluate.py
+
+✓ Dataset bulundu: /kaggle/input/data
+✓ CSV bulundu: Data_Entry_2017.csv
+✓ Görüntü klasörleri: 12/12 bulundu
+
+✓ GPU: Tesla T4
+✓ CUDA: 12.4
+
+======================================================================
+📊 VERİ SPLIT YÖNTEMİ
+======================================================================
+
+✅ TÜM DATASET + MULTI-GPU (MAXIMUM PERFORMANCE!)
+   - 112,120 görüntü (TÜM NIH DATASET) + EfficientNet-B2
+   - 1 GPU 
+   - Patient-level split (data leakage ÖNLENDİ)
+   - 256×256 piksel (224'ten daha iyi detay, dengeli!)
+   - MEDIUM augmentation + TTA (Overfitting önleme!)
+   - NUM_WORKERS: 4 (Kaggle T4 optimal)
+   - Batch: 42 (256x256 için optimal)
+   - Dropout: 0.58 (Piksel artışı için)
+   - Beklenen AUC: 0.86-0.88+ (256x256 + MEDIUM + TTA!)
+   - Tahmini süre: ~9.75 saat (eğitim) + 0.75h (TTA) = 10.5h (12 saat limiti içinde ✅)
+
+ℹ️  Not: Bu, NIH dataset'indeki tüm görüntüleri kullanıyor!
+======================================================================
+
+======================================================================
+ADIM 1/3: VERİ HAZIRLAMA (112K - TÜM DATASET)
+======================================================================
+🔍 112,120 görüntü seçiliyor (TÜM NIH DATASET)...
+⚖️  Stratified sampling...
+👨‍⚕️ Patient-level split (data leakage ÖNLENDİ!)
+📊 Tüm hastalıklar dahil
+📊 Train/Val/Test: 70%/15%/15%
+
+⏱️  Süre: ~10 dakika
+----------------------------------------------------------------------
+======================================================================
+📊 VERİ HAZIRLAMA BAŞLIYOR (112,120 GÖRÜNTÜ)
+======================================================================
+
+1️⃣ Ana dataset yükleniyor...
+   ✓ Toplam kayıt: 112,120
+   ✓ Kolonlar: ['Image Index', 'Finding Labels', 'Follow-up #', 'Patient ID', 'Patient Age', 'Patient Gender', 'View Position', 'OriginalImage[Width', 'Height]', 'OriginalImagePixelSpacing[x', 'y]', 'Unnamed: 11']
+   ✓ Benzersiz hasta sayısı: 30,805
+
+2️⃣ Hastalık dağılımı analizi...
+
+   Mevcut hastalık sayıları:
+   ✓ No Finding          : 60,361 mevcut / 60,000 hedef
+   ✓ Infiltration        : 19,894 mevcut / 19,871 hedef
+   ✓ Effusion            : 13,317 mevcut / 13,317 hedef
+   ✓ Atelectasis         : 11,559 mevcut / 11,559 hedef
+   ✓ Nodule              :  6,331 mevcut /  6,331 hedef
+   ✓ Mass                :  5,782 mevcut /  5,782 hedef
+   ✓ Pneumothorax        :  5,302 mevcut /  5,302 hedef
+   ✓ Consolidation       :  4,667 mevcut /  4,667 hedef
+   ✓ Pleural_Thickening  :  3,385 mevcut /  3,385 hedef
+   ✓ Cardiomegaly        :  2,776 mevcut /  2,776 hedef
+   ✓ Emphysema           :  2,516 mevcut /  2,516 hedef
+   ✓ Edema               :  2,303 mevcut /  2,303 hedef
+   ✓ Fibrosis            :  1,686 mevcut /  1,686 hedef
+   ✓ Pneumonia           :  1,431 mevcut /  1,431 hedef
+   ✓ Hernia              :    227 mevcut /    227 hedef
+
+3️⃣ Multi-label analizi...
+   Multi-label örnekler: 20,796 / 112,120 (18.5%)
+
+4️⃣ TÜM DATASET kullanılıyor (FİLTRELEME KALDIRILDI!)...
+   ✅ MAXIMUM PERFORMANCE: Tüm 112,120 görüntü kullanılacak
+   ✅ Tüm hastalık örnekleri dahil (data loss yok!)
+   ✅ Multi-label ilişkileri korunuyor
+   ✅ Doğal hastalık dağılımı (class weights ile dengelenecek)
+
+   📦 Toplam görüntü: 112,120
+   📦 Benzersiz hasta: 30,805
+
+   📊 Doğal hastalık dağılımı (tüm dataset):
+      No Finding          : 60,361 ( 53.8%)
+      Infiltration        : 19,894 ( 17.7%)
+      Effusion            : 13,317 ( 11.9%)
+      Atelectasis         : 11,559 ( 10.3%)
+      Nodule              :  6,331 (  5.6%)
+      Mass                :  5,782 (  5.2%)
+      Pneumothorax        :  5,302 (  4.7%)
+      Consolidation       :  4,667 (  4.2%)
+      Pleural_Thickening  :  3,385 (  3.0%)
+      Cardiomegaly        :  2,776 (  2.5%)
+      Emphysema           :  2,516 (  2.2%)
+      Edema               :  2,303 (  2.1%)
+      Fibrosis            :  1,686 (  1.5%)
+      Pneumonia           :  1,431 (  1.3%)
+      Hernia              :    227 (  0.2%)
+
+5️⃣ PATIENT-LEVEL Split yapılıyor...
+   ⚠️  UYARI: Aynı hastanın görüntüleri train/val/test'e karışmayacak!
+
+   ✓ Train: 78,566 görüntü (70.1%)
+   ✓ Val:   16,106 görüntü (14.4%)
+   ✓ Test:  17,448 görüntü (15.6%)
+
+   🔍 Patient Overlap Kontrolü:
+      Train-Val overlap: 0 (0 olmalı!)
+      Train-Test overlap: 0 (0 olmalı!)
+      Val-Test overlap: 0 (0 olmalı!)
+      ✅ Patient-level split başarılı! Data leakage yok.
+
+6️⃣ Her setteki hastalık dağılımı:
+
+   Train (78,566 görüntü, 21563 hasta):
+     No Finding          : 42,210 ( 53.7%)
+     Infiltration        : 13,868 ( 17.7%)
+     Effusion            : 9,438 ( 12.0%)
+     Atelectasis         : 8,190 ( 10.4%)
+     Nodule              : 4,432 (  5.6%)
+     Mass                : 4,260 (  5.4%)
+     Pneumothorax        : 3,770 (  4.8%)
+     Consolidation       : 3,228 (  4.1%)
+     Pleural_Thickening  : 2,379 (  3.0%)
+     Cardiomegaly        : 1,891 (  2.4%)
+     Emphysema           : 1,666 (  2.1%)
+     Edema               : 1,630 (  2.1%)
+     Fibrosis            : 1,156 (  1.5%)
+     Pneumonia           :  995 (  1.3%)
+     Hernia              :  158 (  0.2%)
+
+   Val (16,106 görüntü, 4621 hasta):
+     No Finding          : 8,717 ( 54.1%)
+     Infiltration        : 2,933 ( 18.2%)
+     Effusion            : 1,841 ( 11.4%)
+     Atelectasis         : 1,611 ( 10.0%)
+     Nodule              :  920 (  5.7%)
+     Mass                :  762 (  4.7%)
+     Pneumothorax        :  697 (  4.3%)
+     Consolidation       :  668 (  4.1%)
+     Pleural_Thickening  :  470 (  2.9%)
+     Cardiomegaly        :  389 (  2.4%)
+     Emphysema           :  378 (  2.3%)
+     Edema               :  339 (  2.1%)
+     Fibrosis            :  253 (  1.6%)
+     Pneumonia           :  226 (  1.4%)
+     Hernia              :   35 (  0.2%)
+
+   Test (17,448 görüntü, 4621 hasta):
+     No Finding          : 9,434 ( 54.1%)
+     Infiltration        : 3,093 ( 17.7%)
+     Effusion            : 2,038 ( 11.7%)
+     Atelectasis         : 1,758 ( 10.1%)
+     Nodule              :  979 (  5.6%)
+     Mass                :  760 (  4.4%)
+     Pneumothorax        :  835 (  4.8%)
+     Consolidation       :  771 (  4.4%)
+     Pleural_Thickening  :  536 (  3.1%)
+     Cardiomegaly        :  496 (  2.8%)
+     Emphysema           :  472 (  2.7%)
+     Edema               :  334 (  1.9%)
+     Fibrosis            :  277 (  1.6%)
+     Pneumonia           :  210 (  1.2%)
+     Hernia              :   34 (  0.2%)
+
+7️⃣ CSV dosyaları kaydediliyor...
+   ✓ train_112k.csv kaydedildi (78,566 satır)
+   ✓ val_112k.csv kaydedildi (16,106 satır)
+   ✓ test_112k.csv kaydedildi (17,448 satır)
+
+======================================================================
+📊 VERİ HAZIRLAMA TAMAMLANDI!
+======================================================================
+
+✅ Toplam seçilen: 112,120 benzersiz görüntü
+   - Train: 78,566 (70.1%) - 21563 hasta
+   - Val:   16,106 (14.4%) - 4621 hasta
+   - Test:  17,448 (15.6%) - 4621 hasta
+
+🎯 Beklenen Performans:
+   - Hedef AUC: 0.89
+   - Minimum AUC: 0.85
+   - Eğitim süresi: ~6.9 saat
+   - GPU memory: ~12 GB
+
+💡 Önemli İyileştirmeler:
+   ✅ Patient-level split (data leakage önlendi)
+   ✅ Multi-label ilişkileri korundu
+   ✅ TÜM 112,120 görüntü kullanıldı (data loss YOK!)
+   ✅ Tüm hastalıklar tam temsil ediliyor
+   ✅ Kaggle dataset yapısına uyumlu
+   ✅ Filtreleme kaldırıldı (basit + hatasız kod)
+   ✅ Class imbalance: CLASS_WEIGHTS + Focal Loss ile dengeleniyor
+
+🚀 Sonraki Adım: 04_train.py dosyasını çalıştırın
+🎯 Beklenen AUC artışı: 0.77 → 0.85-0.87+ ✅
+======================================================================
+
+✅ Veri hazırlama tamamlandı! (0.1 dk)
+======================================================================
+
+📊 Oluşturulan CSV dosyaları:
+  ✓ train_112k.csv: 78,566 görüntü
+  ✓ val_112k.csv: 16,106 görüntü
+  ✓ test_112k.csv: 17,448 görüntü
+
+======================================================================
+ADIM 2/3: MODEL EĞİTİMİ (112K - 26 EPOCH - TEK GPU + 256x256!)
+======================================================================
+🏗️  EfficientNet-B2 (pretrained ImageNet - 9.1M params)
+📊 Train: ~78,500 görüntü (TÜM DATASET)
+📊 Val: ~16,100 görüntü
+📏 Image: 256×256 (Daha iyi detay için!)
+🔧 Batch: 36 (256x256 için optimal) | Dropout: 0.55 | LR: 0.0003
+🔧 Augmentation: MEDIUM + TTA (Overfitting önleme!)
+🔧 NUM_WORKERS: 4 (Kaggle T4 optimal)
+🔧 TTA: OTOMATİK (eğitim bitince +0.01-0.02 AUC)
+🔧 Focal Loss + Class Weights
+🔧 Cosine Annealing + Warmup (2 epoch)
+🔧 Backbone Freeze: 3 epoch → Unfreeze
+🔧 Mixed Precision: ✅
+🔧 Attention Fusion: ✅
+🔧 Multi-GPU: ❌ KAPALI (Tek GPU daha hızlı!)
+
+🎯 Beklenen AUC: 0.86-0.88+ (256x256 + MEDIUM + dropout 0.58!)
+⏱️  Süre: ~9.75 saat (eğitim) + 0.75h (TTA) = 10.5 saat total
+⚠️  Notebook'u kapatabilirsiniz (Kaggle arka planda devam eder)
+----------------------------------------------------------------------
+
+======================================================================
+⚙️  KONFİGÜRASYON
+======================================================================
+Proje: chest-xray-multimodal-diagnosis v5.0-kaggle-optimized
+Veri: 112,120 görüntü
+Hastalık sayısı: 15
+Device: cuda
+======================================================================
+
+======================================================================
+📦 DATALOADER'LAR OLUŞTURULUYOR
+======================================================================
+/usr/local/lib/python3.11/dist-packages/albumentations/core/validation.py:114: UserWarning: ShiftScaleRotate is a special case of Affine transform. Please use Affine transform instead.
+  original_init(self, **validated_kwargs)
+/kaggle/working/dataset.py:248: UserWarning: Argument(s) 'var_limit' are not valid for transform GaussNoise
+  A.GaussNoise(
+/kaggle/working/dataset.py:252: UserWarning: Argument(s) 'max_holes, max_height, max_width, min_holes, min_height, min_width, fill_value' are not valid for transform CoarseDropout
+  A.CoarseDropout(
+✓ TRAIN Dataset yüklendi: 78,566 görüntü
+  Görüntü klasörleri: 12 adet
+
+📊 TRAIN Multi-label Statistics:
+  Multi-label örnekler: 14624 / 78566 (18.6%)
+
+  Hastalık dağılımı:
+    No Finding          : 42,210 ( 53.7%)
+    Infiltration        : 13,868 ( 17.7%)
+    Effusion            : 9,438 ( 12.0%)
+    Atelectasis         : 8,190 ( 10.4%)
+    Nodule              : 4,432 (  5.6%)
+    Mass                : 4,260 (  5.4%)
+    Pneumothorax        : 3,770 (  4.8%)
+    Consolidation       : 3,228 (  4.1%)
+    Pleural_Thickening  : 2,379 (  3.0%)
+    Cardiomegaly        : 1,891 (  2.4%)
+    Emphysema           : 1,666 (  2.1%)
+    Edema               : 1,630 (  2.1%)
+    Fibrosis            : 1,156 (  1.5%)
+    Pneumonia           :   995 (  1.3%)
+    Hernia              :   158 (  0.2%)
+✓ VAL Dataset yüklendi: 16,106 görüntü
+  Görüntü klasörleri: 12 adet
+✓ TEST Dataset yüklendi: 17,448 görüntü
+  Görüntü klasörleri: 12 adet
+
+✓ DataLoader'lar hazır:
+  - Train batches: 2,182
+  - Val batches: 448
+  - Test batches: 485
+======================================================================
+
+======================================================================
+🗂️  MODEL OLUŞTURULUYOR
+======================================================================
+Downloading: "https://download.pytorch.org/models/efficientnet_b3_rwightman-b3899882.pth" to /root/.cache/torch/hub/checkpoints/efficientnet_b3_rwightman-b3899882.pth
+100%|███████████████████████████████████████| 47.2M/47.2M [00:00<00:00, 170MB/s]
+✅ ImageEncoder: efficientnet_b3 loaded (output dim: 1536)
+✅ Image encoder (EfficientNet) frozen
+
+======================================================================
+🎯 TEK GPU MODU (Overhead yok, daha hızlı!)
+======================================================================
+  Mevcut GPU: 2 adet
+  Kullanılacak: 1 GPU (DataParallel overhead önlendi!)
+  Batch Size: 36 (tek GPU'ya)
+  ✅ Tek GPU aktif!
+======================================================================
+
+✓ Model oluşturuldu: efficientnet_b3
+  Toplam parametreler: 12,352,169
+  Eğitilebilir: 1,655,937
+======================================================================
+
+⚖️  Class Weights:
+  No Finding          : 0.157
+  Infiltration        : 0.474
+  Effusion            : 0.707
+  Atelectasis         : 0.814
+  Nodule              : 1.486
+  Mass                : 1.627
+  Pneumothorax        : 1.775
+  Consolidation       : 2.016
+  Pleural_Thickening  : 2.780
+  Cardiomegaly        : 3.390
+  Emphysema           : 3.740
+  Edema               : 4.086
+  Fibrosis            : 5.581
+  Pneumonia           : 6.576
+  Hernia              : 41.455
+  📉 CosineAnnealingLR: T_max=14 (epochs 5-18)
+
+======================================================================
+EĞİTİM BAŞLIYOR (112K GÖRÜNTÜ)
+======================================================================
+Epochs: 18
+Batch size: 36
+Learning rate: 0.0003
+Weight decay: 0.0001
+Dropout: 0.55
+Device: cuda
+Mixed Precision: ✅
+Focal Loss: ✅
+Class Weights: ✅
+Cosine Annealing: ✅
+Backbone Freeze: 2 epochs
+Train batches: 2,182
+Val batches: 448
+
+🎯 Hedef: AUC > 0.89
+⏱️  Tahmini süre: ~6.9 saat
+⏰  Maksimum süre: 12 saat
+======================================================================
+
+Epoch 1/18 [TRAIN]: 100%|██████| 2182/2182 [14:20<00:00,  2.53it/s, loss=0.0172]
+Validating: 100%|█████████████████████████████| 448/448 [02:39<00:00,  2.81it/s]
+
+Epoch 1/18 - 17.0m (0.3h)
+  Train Loss: 0.0271 | Train AUC: 0.5682
+  Val Loss:   0.0242 | Val AUC:   0.6870
+  Overfitting Gap: -0.1188 ✅
+  LR: 1.50e-04
+  🏆 En iyi model kaydedildi! AUC: 0.6870
+Epoch 2/18 [TRAIN]: 100%|██████| 2182/2182 [13:35<00:00,  2.67it/s, loss=0.0202]
+Validating: 100%|█████████████████████████████| 448/448 [02:31<00:00,  2.96it/s]
+
+Epoch 2/18 - 33.1m (0.6h)
+  Train Loss: 0.0250 | Train AUC: 0.6143
+  Val Loss:   0.0237 | Val AUC:   0.7005
+  Overfitting Gap: -0.0861 ✅
+  LR: 3.00e-04
+  🏆 En iyi model kaydedildi! AUC: 0.7005
+✅ Image encoder (EfficientNet) unfrozen
+  📉 CosineAnnealingLR reset: T_max=15 (epochs 4-18)
+  ✅ Optimizer VE Scheduler yenilendi (LR: 0.0003)
+Epoch 3/18 [TRAIN]: 100%|██████| 2182/2182 [15:23<00:00,  2.36it/s, loss=0.0167]
+Validating: 100%|█████████████████████████████| 448/448 [02:33<00:00,  2.92it/s]
+
+Epoch 3/18 - 51.1m (0.9h)
+  Train Loss: 0.0244 | Train AUC: 0.6479
+  Val Loss:   0.0230 | Val AUC:   0.7343
+  Overfitting Gap: -0.0865 ✅
+  LR: 2.97e-04
+  🏆 En iyi model kaydedildi! AUC: 0.7343
+Epoch 4/18 [TRAIN]: 100%|██████| 2182/2182 [15:14<00:00,  2.39it/s, loss=0.0284]
+Validating: 100%|█████████████████████████████| 448/448 [02:33<00:00,  2.93it/s]
+
+Epoch 4/18 - 68.9m (1.1h)
+  Train Loss: 0.0233 | Train AUC: 0.7001
+  Val Loss:   0.0217 | Val AUC:   0.7767
+  Overfitting Gap: -0.0765 ✅
+  LR: 2.87e-04
+  🏆 En iyi model kaydedildi! AUC: 0.7767
+Epoch 5/18 [TRAIN]: 100%|██████| 2182/2182 [15:06<00:00,  2.41it/s, loss=0.0193]
+Validating: 100%|█████████████████████████████| 448/448 [02:44<00:00,  2.72it/s]
+
+Epoch 5/18 - 86.8m (1.4h)
+  Train Loss: 0.0226 | Train AUC: 0.7248
+  Val Loss:   0.0208 | Val AUC:   0.7917
+  Overfitting Gap: -0.0669 ✅
+  LR: 2.71e-04
+  🏆 En iyi model kaydedildi! AUC: 0.7917
+  💾 Checkpoint kaydedildi: epoch_5.pth
+Epoch 6/18 [TRAIN]: 100%|██████| 2182/2182 [15:11<00:00,  2.39it/s, loss=0.0192]
+Validating: 100%|█████████████████████████████| 448/448 [02:31<00:00,  2.96it/s]
+
+Epoch 6/18 - 104.5m (1.7h)
+  Train Loss: 0.0219 | Train AUC: 0.7467
+  Val Loss:   0.0211 | Val AUC:   0.7946
+  Overfitting Gap: -0.0478 ✅
+  LR: 2.50e-04
+  🏆 En iyi model kaydedildi! AUC: 0.7946
+Epoch 7/18 [TRAIN]: 100%|██████| 2182/2182 [15:12<00:00,  2.39it/s, loss=0.0231]
+Validating: 100%|█████████████████████████████| 448/448 [02:32<00:00,  2.93it/s]
+
+Epoch 7/18 - 122.3m (2.0h)
+  Train Loss: 0.0214 | Train AUC: 0.7602
+  Val Loss:   0.0209 | Val AUC:   0.7942
+  Overfitting Gap: -0.0340 ✅
+  LR: 2.25e-04
+Epoch 8/18 [TRAIN]: 100%|██████| 2182/2182 [15:05<00:00,  2.41it/s, loss=0.0190]
+Validating: 100%|█████████████████████████████| 448/448 [02:32<00:00,  2.94it/s]
+
+Epoch 8/18 - 139.9m (2.3h)
+  Train Loss: 0.0209 | Train AUC: 0.7727
+  Val Loss:   0.0206 | Val AUC:   0.8079
+  Overfitting Gap: -0.0352 ✅
+  LR: 1.96e-04
+  🏆 En iyi model kaydedildi! AUC: 0.8079
+Epoch 9/18 [TRAIN]: 100%|██████| 2182/2182 [15:08<00:00,  2.40it/s, loss=0.0211]
+Validating: 100%|█████████████████████████████| 448/448 [02:35<00:00,  2.89it/s]
+
+Epoch 9/18 - 157.6m (2.6h)
+  Train Loss: 0.0205 | Train AUC: 0.7831
+  Val Loss:   0.0198 | Val AUC:   0.8113
+  Overfitting Gap: -0.0282 ✅
+  LR: 1.66e-04
+  🏆 En iyi model kaydedildi! AUC: 0.8113
+Epoch 10/18 [TRAIN]: 100%|█████| 2182/2182 [15:12<00:00,  2.39it/s, loss=0.0210]
+Validating: 100%|█████████████████████████████| 448/448 [02:36<00:00,  2.86it/s]
+
+Epoch 10/18 - 175.5m (2.9h)
+  Train Loss: 0.0201 | Train AUC: 0.7918
+  Val Loss:   0.0198 | Val AUC:   0.8170
+  Overfitting Gap: -0.0252 ✅
+  LR: 1.34e-04
+  🏆 En iyi model kaydedildi! AUC: 0.8170
+  💾 Checkpoint kaydedildi: epoch_10.pth
+Epoch 11/18 [TRAIN]: 100%|█████| 2182/2182 [15:05<00:00,  2.41it/s, loss=0.0189]
+Validating: 100%|█████████████████████████████| 448/448 [02:33<00:00,  2.93it/s]
+
+Epoch 11/18 - 193.2m (3.2h)
+  Train Loss: 0.0197 | Train AUC: 0.7979
+  Val Loss:   0.0197 | Val AUC:   0.8194
+  Overfitting Gap: -0.0215 ✅
+  LR: 1.04e-04
+  🏆 En iyi model kaydedildi! AUC: 0.8194
+Epoch 12/18 [TRAIN]: 100%|█████| 2182/2182 [15:03<00:00,  2.42it/s, loss=0.0168]
+Validating: 100%|█████████████████████████████| 448/448 [02:32<00:00,  2.94it/s]
+
+Epoch 12/18 - 210.8m (3.5h)
+  Train Loss: 0.0194 | Train AUC: 0.8075
+  Val Loss:   0.0194 | Val AUC:   0.8203
+  Overfitting Gap: -0.0128 ✅
+  LR: 7.51e-05
+  🏆 En iyi model kaydedildi! AUC: 0.8203
+Epoch 13/18 [TRAIN]: 100%|█████| 2182/2182 [15:05<00:00,  2.41it/s, loss=0.0209]
+Validating: 100%|█████████████████████████████| 448/448 [02:33<00:00,  2.91it/s]
+
+Epoch 13/18 - 228.4m (3.8h)
+  Train Loss: 0.0191 | Train AUC: 0.8114
+  Val Loss:   0.0194 | Val AUC:   0.8223
+  Overfitting Gap: -0.0109 ✅
+  LR: 4.97e-05
+  🏆 En iyi model kaydedildi! AUC: 0.8223
+Epoch 14/18 [TRAIN]: 100%|█████| 2182/2182 [15:00<00:00,  2.42it/s, loss=0.0122]
+Validating: 100%|█████████████████████████████| 448/448 [02:32<00:00,  2.93it/s]
+
+Epoch 14/18 - 246.0m (4.1h)
+  Train Loss: 0.0189 | Train AUC: 0.8154
+  Val Loss:   0.0195 | Val AUC:   0.8229
+  Overfitting Gap: -0.0074 ✅
+  LR: 2.87e-05
+  🏆 En iyi model kaydedildi! AUC: 0.8229
+Epoch 15/18 [TRAIN]: 100%|█████| 2182/2182 [15:10<00:00,  2.40it/s, loss=0.0184]
+Validating: 100%|█████████████████████████████| 448/448 [02:42<00:00,  2.76it/s]
+
+Epoch 15/18 - 263.9m (4.4h)
+  Train Loss: 0.0186 | Train AUC: 0.8199
+  Val Loss:   0.0195 | Val AUC:   0.8215
+  Overfitting Gap: -0.0016 ✅
+  LR: 1.31e-05
+  💾 Checkpoint kaydedildi: epoch_15.pth
+Epoch 16/18 [TRAIN]: 100%|█████| 2182/2182 [15:17<00:00,  2.38it/s, loss=0.0126]
+Validating: 100%|█████████████████████████████| 448/448 [02:37<00:00,  2.84it/s]
+
+Epoch 16/18 - 281.8m (4.7h)
+  Train Loss: 0.0186 | Train AUC: 0.8215
+  Val Loss:   0.0196 | Val AUC:   0.8231
+  Overfitting Gap: -0.0016 ✅
+  LR: 3.38e-06
+  🏆 En iyi model kaydedildi! AUC: 0.8231
+Epoch 17/18 [TRAIN]: 100%|█████| 2182/2182 [15:17<00:00,  2.38it/s, loss=0.0142]
+Validating: 100%|█████████████████████████████| 448/448 [02:34<00:00,  2.90it/s]
+
+Epoch 17/18 - 299.7m (5.0h)
+  Train Loss: 0.0184 | Train AUC: 0.8237
+  Val Loss:   0.0195 | Val AUC:   0.8230
+  Overfitting Gap: 0.0008 ✅
+  LR: 1.00e-07
+Epoch 18/18 [TRAIN]: 100%|█████| 2182/2182 [15:15<00:00,  2.38it/s, loss=0.0173]
+Validating: 100%|█████████████████████████████| 448/448 [02:35<00:00,  2.88it/s]
+
+Epoch 18/18 - 317.6m (5.3h)
+  Train Loss: 0.0185 | Train AUC: 0.8235
+  Val Loss:   0.0195 | Val AUC:   0.8231
+  Overfitting Gap: 0.0004 ✅
+  LR: 3.38e-06
+  🏆 En iyi model kaydedildi! AUC: 0.8231
+
+======================================================================
+✅ EĞİTİM TAMAMLANDI!
+======================================================================
+Toplam süre: 317.6 dakika (5.3 saat)
+En iyi Val AUC: 0.8231 (Epoch 18)
+⚠️  Hedefin altında: 0.8231 < 0.89
+   Fark: 0.0669
+======================================================================
+
+✅ Eğitim tamamlandı!
+📂 Model: /kaggle/working/models/best_model.pth
+🎯 En iyi AUC: 0.8231
+
+✅ Eğitim tamamlandı! (5.3 saat)
+======================================================================
+
+📊 En İyi Model:
+  Epoch: 18
+  Val AUC: 0.8231
+  ⚠️  Hedefin altında: 0.8231
+
+======================================================================
+ADIM 3/3: MODEL DEĞERLENDİRME (TEST)
+======================================================================
+🔬 Test: ~9,000 görüntü
+📊 Metrikler: AUC, F1, Sensitivity, Specificity...
+📈 ROC curves + Confusion matrices
+
+⏱️  Süre: ~10 dakika
+----------------------------------------------------------------------
+======================================================================
+🔬 MODEL DEĞERLENDİRME
+======================================================================
+
+📂 Model yükleniyor...
+✅ ImageEncoder: efficientnet_b3 loaded (output dim: 1536)
+✓ Model yüklendi (Epoch: 18, Val AUC: 0.8231)
+
+📂 Test dataset yükleniyor...
+✓ TEST Dataset yüklendi: 17,448 görüntü
+  Görüntü klasörleri: 12 adet
+
+🔮 Test seti üzerinde tahminler yapılıyor...
+Predicting: 100%|█████████████████████████████| 485/485 [02:44<00:00,  2.95it/s]
+✓ 17448 görüntü için tahmin yapıldı
+
+📊 Metrikler hesaplanıyor...
+
+======================================================================
+📈 TEST SETİ SONUÇLARI
+======================================================================
+Hastalık                 AUC      AP      F1    Prec     Rec    Sens    Spec     N
+-------------------------------------------------------------------------------------
+No Finding            0.7742  0.7895  0.0000  0.0000  0.0000  0.0000  1.0000  9434
+Infiltration          0.6903  0.3436  0.0000  0.0000  0.0000  0.0000  1.0000  3093
+Effusion              0.8563  0.4548  0.0088  0.8182  0.0044  0.0044  0.9999  2038
+Atelectasis           0.7704  0.2508  0.0000  0.0000  0.0000  0.0000  1.0000  1758
+Nodule                0.7296  0.1870  0.0972  0.4091  0.0552  0.0552  0.9953   979
+Mass                  0.8343  0.2775  0.3372  0.3473  0.3276  0.3276  0.9720   760
+Pneumothorax          0.8845  0.3189  0.4119  0.3401  0.5222  0.5222  0.9491   835
+Consolidation         0.7983  0.1382  0.0026  0.5000  0.0013  0.0013  0.9999   771
+Pleural_Thickening    0.8015  0.1306  0.1956  0.1785  0.2164  0.2164  0.9684   536
+Cardiomegaly          0.9104  0.3372  0.4106  0.3182  0.5786  0.5786  0.9637   496
+Emphysema             0.9353  0.4199  0.4948  0.3962  0.6589  0.6589  0.9721   472
+Edema                 0.8859  0.1557  0.2141  0.1400  0.4551  0.4551  0.9454   334
+Fibrosis              0.7981  0.0967  0.1643  0.1226  0.2491  0.2491  0.9712   277
+Pneumonia             0.7610  0.0395  0.0338  0.0343  0.0333  0.0333  0.9886   210
+Hernia                0.8679  0.3283  0.2828  0.2154  0.4118  0.4118  0.9971    34
+-------------------------------------------------------------------------------------
+MACRO AVERAGE         0.8199  0.2845  0.1769
+======================================================================
+
+⚠️  Hedefin altında: AUC 0.8199 < 0.89
+
+📊 ROC eğrileri çiziliyor...
+  ✓ Kaydedildi: /kaggle/working/results/roc_curves.png
+
+📊 Confusion matrices çiziliyor...
+  ✓ Kaydedildi: /kaggle/working/results/confusion_matrices.png
+
+💾 Sonuçlar kaydediliyor...
+  ✓ Metrikler: /kaggle/working/results/test_metrics.csv
+  ✓ Tahminler: /kaggle/working/results/test_predictions.csv
+
+======================================================================
+✅ DEĞERLENDİRME TAMAMLANDI!
+======================================================================
+Sonuçlar kaydedildi: /kaggle/working/results
+======================================================================
+
+✅ Değerlendirme tamamlandı! (3.1 dk)
+======================================================================
+
+📊 TEST SONUÇLARI:
+  Macro AUC: 0.8199
+  Macro F1:  0.1769
+  ⚠️  Hedefin altında: AUC < 0.84
+
+  Top 5 Hastalık (En Yüksek AUC):
+    Emphysema           : AUC 0.9353
+    Cardiomegaly        : AUC 0.9104
+    Edema               : AUC 0.8859
+    Pneumothorax        : AUC 0.8845
+    Hernia              : AUC 0.8679
+
+  Bottom 5 Hastalık (En Düşük AUC):
+    Infiltration        : AUC 0.6903
+    Nodule              : AUC 0.7296
+    Pneumonia           : AUC 0.7610
+    Atelectasis         : AUC 0.7704
+    No Finding          : AUC 0.7742
+
+  Hernia (oversampled):
+    AUC: 0.8679 | Support: 34.0 ✅
+
+======================================================================
+BONUS: TEST-TIME AUGMENTATION (TTA) - OTOMATİK
+======================================================================
+🔮 5 farklı augmentation ile tahmin
+⏱️  Süre: ~25-30 dakika
+🎯 Beklenen AUC artışı: +0.01-0.02
+💡 LIGHT aug kullanıldığı için TTA otomatik çalıştırılıyor!
+
+
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+======================================================================
+🔬 MODEL DEĞERLENDİRME (WITH TTA)
+======================================================================
+
+📂 Model yükleniyor...
+✅ ImageEncoder: efficientnet_b3 loaded (output dim: 1536)
+✓ Model yüklendi (Val AUC: 0.8231)
+
+📂 Test dataset yükleniyor...
+✓ TEST Dataset yüklendi: 17,448 görüntü
+  Görüntü klasörleri: 12 adet
+✓ Test dataset yüklendi: 17448 görüntü
+
+🔮 Test-Time Augmentation (TTA) ile tahmin yapılıyor...
+  Augmentation sayısı: 5
+  Test örnekleri: 17448
+  Batch size: 8
+TTA Evaluation: 100%|█████████████████████| 17448/17448 [34:26<00:00,  8.44it/s]
+
+✓ 17448 görüntü için TTA tamamlandı!
+
+======================================================================
+📈 TTA SONUÇLARI
+======================================================================
+
+🎯 Macro AUC (with TTA): 0.8224
+📊 Karşılaştırma:
+  Normal AUC:  0.8199
+  TTA AUC:     0.8224
+  Kazanç:      +0.0025 ✅
+
+📋 Hastalık Bazında (Top 5):
+  Emphysema           : AUC 0.9384
+  Cardiomegaly        : AUC 0.9136
+  Edema               : AUC 0.8880
+  Pneumothorax        : AUC 0.8868
+  Hernia              : AUC 0.8770
+
+✅ TTA sonuçları kaydedildi:
+  /kaggle/working/results/test_metrics_tta.csv
+
+======================================================================
+TTA DEĞERLENDİRME TAMAMLANDI!
+======================================================================
+
+✅ TTA tamamlandı! (34.5 dk)
+
+📊 TTA Karşılaştırma:
+  Normal AUC: 0.8199
+  TTA AUC:    0.8224
+  Kazanç:     +0.0025 ✅
+======================================================================
+
+======================================================================
+PROJE TAMAMLANDI!
+======================================================================
+
+⏱️  Toplam Süre: 5.9 saat
+   Veri Hazırlama: 0.1 dk
+   Eğitim: 5.3 saat
+   Değerlendirme: 3.1 dk
+   ✅ 12 saat limiti içinde! (6.1 saat kaldı)
+
+📂 Oluşturulan Dosyalar:
+  /kaggle/working/
+    ├── train_60k.csv
+    ├── val_60k.csv
+    ├── test_60k.csv
+    ├── models/
+    │   └── best_model.pth ⭐
+    └── results/
+        ├── test_metrics.csv
+        ├── test_predictions.csv
+        ├── roc_curves.png
+        └── confusion_matrices.png
+
+📥 Dosyaları İndirmek İçin:
+  Yöntem 1 (Otomatik):
+    from IPython.display import FileLink
+    FileLink('/kaggle/working/models/best_model.pth')
+
+  Yöntem 2 (Manuel):
+    Output sekmesi → İlgili dosya → Download
+
+💡 v5.0 Yeni Özellikler:
+  ✅ Patient-level split (data leakage ÖNLENDİ!)
+  ✅ Geliştirilmiş demographic encoder (8→12 feature)
+  ✅ Attention fusion mechanism
+  ✅ Cosine annealing + warmup
+  ✅ Backbone freezing stratejisi (3 epoch)
+  ✅ Focal Loss + Class Weights
+  ✅ 60K veri (50K→60K)
+  ✅ Hedef AUC: 0.86 (0.85→0.86)
+
+📚 İyileştirme Fikirleri:
+  - TTA kullanın: +0.01-0.02 AUC kazancı
+  - Ensemble (3-5 model): Daha kararlı sonuçlar
+  - EfficientNet-B2/B3: Daha büyük model
+  - Epoch sayısını artırın: 25-30 epoch
+
+======================================================================
+
+======================================================================

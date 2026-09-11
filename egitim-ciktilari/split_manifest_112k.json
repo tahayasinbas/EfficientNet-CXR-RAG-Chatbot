@@ -1,0 +1,215 @@
+{
+  "random_seed": 42,
+  "total_images": 112120,
+  "total_unique_patients": 30805,
+  "split_ratios": {
+    "train": 0.7,
+    "val": 0.15,
+    "test": 0.15
+  },
+  "patient_overlap": {
+    "train_val": 0,
+    "train_test": 0,
+    "val_test": 0
+  },
+  "splits": {
+    "Train": {
+      "n_images": 78566,
+      "n_patients": 21563,
+      "disease_counts": {
+        "No Finding": {
+          "count": 42210,
+          "percentage": 53.73
+        },
+        "Infiltration": {
+          "count": 13868,
+          "percentage": 17.65
+        },
+        "Effusion": {
+          "count": 9438,
+          "percentage": 12.01
+        },
+        "Atelectasis": {
+          "count": 8190,
+          "percentage": 10.42
+        },
+        "Nodule": {
+          "count": 4432,
+          "percentage": 5.64
+        },
+        "Mass": {
+          "count": 4260,
+          "percentage": 5.42
+        },
+        "Pneumothorax": {
+          "count": 3770,
+          "percentage": 4.8
+        },
+        "Consolidation": {
+          "count": 3228,
+          "percentage": 4.11
+        },
+        "Pleural_Thickening": {
+          "count": 2379,
+          "percentage": 3.03
+        },
+        "Cardiomegaly": {
+          "count": 1891,
+          "percentage": 2.41
+        },
+        "Emphysema": {
+          "count": 1666,
+          "percentage": 2.12
+        },
+        "Edema": {
+          "count": 1630,
+          "percentage": 2.07
+        },
+        "Fibrosis": {
+          "count": 1156,
+          "percentage": 1.47
+        },
+        "Pneumonia": {
+          "count": 995,
+          "percentage": 1.27
+        },
+        "Hernia": {
+          "count": 158,
+          "percentage": 0.2
+        }
+      }
+    },
+    "Val": {
+      "n_images": 16106,
+      "n_patients": 4621,
+      "disease_counts": {
+        "No Finding": {
+          "count": 8717,
+          "percentage": 54.12
+        },
+        "Infiltration": {
+          "count": 2933,
+          "percentage": 18.21
+        },
+        "Effusion": {
+          "count": 1841,
+          "percentage": 11.43
+        },
+        "Atelectasis": {
+          "count": 1611,
+          "percentage": 10.0
+        },
+        "Nodule": {
+          "count": 920,
+          "percentage": 5.71
+        },
+        "Mass": {
+          "count": 762,
+          "percentage": 4.73
+        },
+        "Pneumothorax": {
+          "count": 697,
+          "percentage": 4.33
+        },
+        "Consolidation": {
+          "count": 668,
+          "percentage": 4.15
+        },
+        "Pleural_Thickening": {
+          "count": 470,
+          "percentage": 2.92
+        },
+        "Cardiomegaly": {
+          "count": 389,
+          "percentage": 2.42
+        },
+        "Emphysema": {
+          "count": 378,
+          "percentage": 2.35
+        },
+        "Edema": {
+          "count": 339,
+          "percentage": 2.1
+        },
+        "Fibrosis": {
+          "count": 253,
+          "percentage": 1.57
+        },
+        "Pneumonia": {
+          "count": 226,
+          "percentage": 1.4
+        },
+        "Hernia": {
+          "count": 35,
+          "percentage": 0.22
+        }
+      }
+    },
+    "Test": {
+      "n_images": 17448,
+      "n_patients": 4621,
+      "disease_counts": {
+        "No Finding": {
+          "count": 9434,
+          "percentage": 54.07
+        },
+        "Infiltration": {
+          "count": 3093,
+          "percentage": 17.73
+        },
+        "Effusion": {
+          "count": 2038,
+          "percentage": 11.68
+        },
+        "Atelectasis": {
+          "count": 1758,
+          "percentage": 10.08
+        },
+        "Nodule": {
+          "count": 979,
+          "percentage": 5.61
+        },
+        "Mass": {
+          "count": 760,
+          "percentage": 4.36
+        },
+        "Pneumothorax": {
+          "count": 835,
+          "percentage": 4.79
+        },
+        "Consolidation": {
+          "count": 771,
+          "percentage": 4.42
+        },
+        "Pleural_Thickening": {
+          "count": 536,
+          "percentage": 3.07
+        },
+        "Cardiomegaly": {
+          "count": 496,
+          "percentage": 2.84
+        },
+        "Emphysema": {
+          "count": 472,
+          "percentage": 2.71
+        },
+        "Edema": {
+          "count": 334,
+          "percentage": 1.91
+        },
+        "Fibrosis": {
+          "count": 277,
+          "percentage": 1.59
+        },
+        "Pneumonia": {
+          "count": 210,
+          "percentage": 1.2
+        },
+        "Hernia": {
+          "count": 34,
+          "percentage": 0.19
+        }
+      }
+    }
+  }
+}

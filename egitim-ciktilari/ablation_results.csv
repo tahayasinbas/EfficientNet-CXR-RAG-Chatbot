@@ -1,0 +1,9 @@
+preset,overrides,best_val_auc,test_macro_auc,test_macro_f1@0.5,test_macro_sensitivity@0.5,train_hours,epochs,ablation_mode,fusion_type,class_weight_scheme,use_focal_loss,use_augmentation
+image_only,{'ABLATION_MODE': 'image_only'},0.833809498630461,0.8307181996112983,0.2801363721786163,0.6914504957512375,3.15,10,image_only,gating,corrected,True,True
+metadata_only,{'ABLATION_MODE': 'metadata_only'},0.621582552223362,0.612400218947276,0.1218896232543422,0.5228641269870635,2.7,10,metadata_only,gating,corrected,True,True
+concat_no_gating,{'FUSION_TYPE': 'concat'},0.8307940162141166,0.8319805923086535,0.2706740637962184,0.6891424123226465,3.07,10,full,concat,corrected,True,True
+naive_class_weights,{'CLASS_WEIGHT_SCHEME': 'naive'},0.8147298817888892,0.8112297503609324,0.1430753830448851,0.1919979386658831,3.87,10,full,gating,naive,True,True
+self_attention_fusion,{'FUSION_TYPE': 'self_attention'},0.8147470615681075,0.8118716302903705,0.2334315194133179,0.6847856137918101,3.61,10,full,self_attention,corrected,True,True
+no_focal_loss,{'USE_FOCAL_LOSS': False},0.8304592635099045,0.8257469368568235,0.3025813724322598,0.6073490204898041,3.47,10,full,gating,corrected,False,True
+no_augmentation,{'USE_AUGMENTATION': False},0.820943,0.819257,0.266017,0.686314,2.97,10,full,gating,corrected,True,False
+full_model,{},0.8357004122072146,0.8323081137093158,0.2740449243525349,0.6957151812848221,3.45,10,full,gating,corrected,True,True
