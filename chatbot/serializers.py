@@ -7,7 +7,17 @@ class ChatMessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ChatMessage
-        fields = ['id', 'sender', 'content', 'rag_source', 'rag_confidence', 'created_at']
+        fields = [
+            'id',
+            'sender',
+            'content',
+            'rag_source',
+            'rag_confidence',
+            'rag_query',
+            'rag_query_source',
+            'rag_query_metadata',
+            'created_at'
+        ]
         read_only_fields = ['id', 'created_at']
 
 
@@ -34,3 +44,10 @@ class ChatMessageCreateSerializer(serializers.Serializer):
         if not value.strip():
             raise serializers.ValidationError("Message cannot be empty")
         return value
+
+
+class AutomaticRAGQuerySerializer(serializers.Serializer):
+    """Serializer for classifier-guided automatic RAG requests"""
+
+    session_id = serializers.IntegerField(required=False, allow_null=True)
+    xray_id = serializers.IntegerField(required=True)

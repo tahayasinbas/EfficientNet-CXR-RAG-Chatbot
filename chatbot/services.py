@@ -24,6 +24,8 @@ from llama_index.core.retrievers import VectorIndexRetriever, BaseRetriever
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.vector_stores.postgres import PGVectorStore
 
+from .query_builder import build_rag_query
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(dotenv_path=BASE_DIR / '.env', override=True)
 
@@ -264,15 +266,33 @@ Görevin: Kullanıcının sağladığı NIH Chest X-ray veri seti üzerinde eği
         base_prompt += docs_string
         return base_prompt
 
-    def get_response(self, question: str, context: Dict = None, session_id: int = None) -> Dict:
+    def build_automatic_query(self, context: Dict = None) -> Dict:
+        context = context or {}
+        return build_rag_query(
+            diagnoses=context.get("diagnoses", []),
+            patient=context.get("patient", {}),
+            thresholds=getattr(settings, "RAG_CLASS_THRESHOLDS", None),
+        )
+
+    def get_response(
+        self,
+        question: str,
+        context: Dict = None,
+        session_id: int = None,
+        query_metadata: Dict = None,
+    ) -> Dict:
         try:
             print(f"[RAG] get_response: {question[:60]}...")
 
             if not self._initialized:
                 self._initialize()
 
+            retrieval_query = question
+            if query_metadata:
+                retrieval_query = query_metadata["query"]
+
             print("[RAG] Retrieving documents (hybrid)...")
-            query_bundle = QueryBundle(query_str=question)
+            query_bundle = QueryBundle(query_str=retrieval_query)
             nodes = self.retriever._retrieve(query_bundle)
             print(f"[RAG] Retrieved {len(nodes)} nodes")
             docs_string = "\n\n".join(n.node.text for n in nodes)
@@ -309,13 +329,33 @@ Görevin: Kullanıcının sağladığı NIH Chest X-ray veri seti üzerinde eği
                 "content": response.text,
                 "source": "RAG System",
                 "confidence": None,
+                "rag_query": retrieval_query,
+                "rag_query_source": (
+                    query_metadata["query_source"] if query_metadata else "user_message"
+                ),
+                "rag_query_metadata": query_metadata or {
+                    "query": retrieval_query,
+                    "query_source": "user_message",
+                    "query_inputs": {"message": question},
+                    "selected_labels": [],
+                    "probabilities": {},
+                    "thresholds": {},
+                    "query_template_version": None,
+                },
             }
 
         except Exception as e:
             print(f"[RAG] ERROR in get_response: {e}")
             import traceback
             traceback.print_exc()
-            return self._get_fallback_response(question, context, error=e)
+            fallback_response = self._get_fallback_response(question, context, error=e)
+            if query_metadata:
+                fallback_response.update({
+                    "rag_query": query_metadata["query"],
+                    "rag_query_source": query_metadata["query_source"],
+                    "rag_query_metadata": query_metadata,
+                })
+            return fallback_response
 
     def _get_fallback_response(self, question: str, context: Dict = None, error: Exception = None) -> Dict:
         question_lower = question.lower()

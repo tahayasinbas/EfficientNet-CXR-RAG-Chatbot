@@ -8,4 +8,5 @@ router.register(r'sessions', ChatViewSet, basename='chat')
 urlpatterns = [
     path('', include(router.urls)),
     path('send/', ChatViewSet.as_view({'post': 'send'}), name='chat-send'),
+    path('automatic/', ChatViewSet.as_view({'post': 'automatic'}), name='chat-automatic'),
 ]

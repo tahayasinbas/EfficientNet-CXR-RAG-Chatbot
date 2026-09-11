@@ -44,6 +44,9 @@ class ChatMessage(models.Model):
     # RAG metadata
     rag_source = models.CharField(max_length=255, blank=True, null=True)
     rag_confidence = models.FloatField(blank=True, null=True)
+    rag_query = models.TextField(blank=True, null=True)
+    rag_query_source = models.CharField(max_length=100, blank=True, null=True)
+    rag_query_metadata = models.JSONField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 

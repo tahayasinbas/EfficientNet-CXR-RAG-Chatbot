@@ -182,3 +182,23 @@ RAG_CHATBOT_CONFIG = {
     'RRF_K':  60,
     'ALPHA':  0.5,
 }
+
+# Class-specific RAG query thresholds. Replace these defaults with thresholds
+# calibrated on the validation set when those values are exported.
+RAG_CLASS_THRESHOLDS = {
+    'No Finding': 0.50,
+    'Infiltration': 0.50,
+    'Effusion': 0.50,
+    'Atelectasis': 0.50,
+    'Nodule': 0.50,
+    'Mass': 0.50,
+    'Pneumothorax': 0.50,
+    'Consolidation': 0.50,
+    'Pleural_Thickening': 0.50,
+    'Cardiomegaly': 0.50,
+    'Emphysema': 0.50,
+    'Edema': 0.50,
+    'Fibrosis': 0.50,
+    'Pneumonia': 0.50,
+    'Hernia': 0.50,
+}
