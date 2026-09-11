@@ -1244,5 +1244,5 @@ materyalidir. Kullanıyorsanız lütfen ilgili makaleye atıf verin.
 **Versiyon**: 2.1.0 — hakem revizyonu sürümü (düzeltilmiş class-weight ile yeniden eğitim,
 eşik kalibrasyonu, 8 konfigürasyonluk epoch-eşleşmeli ablation, Grad-CAM, hesaplama profili,
 decision-curve analysis)
-**Geliştirici**: KDS Ekibi
+**Geliştirici**: KDS Ekibi, MUSTAFA ATAKLI - TAHA YASİN BAŞ
 
