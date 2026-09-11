@@ -127,6 +127,69 @@ hiçbir şey değişmeden **0.0014** fark. Tek-seed'li koşumların oynaklığı
 
 Ham sonuçlar: `egitim-ciktilari/ablation_results.csv`
 
+### Decision-Curve Analysis (klinik net fayda)
+
+Net fayda, modele göre karar vermenin **"herkesi tedavi et"** ve **"kimseyi tedavi etme"**
+varsayılan stratejilerinden iyi olup olmadığını ölçer (Vickers & Elkin 2006):
+
+```
+NB(model)      = TP/N - (FP/N) * p_t/(1-p_t)
+NB(treat all)  = prevalans - (1-prevalans) * p_t/(1-p_t)
+NB(treat none) = 0
+```
+
+**Sonuç iki aşamalı ve bu deponun en dikkat çekici bulgusu:**
+
+| | Klinik net fayda gösteren sınıf |
+|---|---|
+| **Ham sigmoid çıktıları** | **1 / 15** (sadece "No Finding") |
+| **Validation'da kalibre edilmiş** | **14 / 15** (istisna: Hernia) |
+
+**Neden ham olasılıklar başarısız?** DCA sıralamaya değil **kalibrasyona** duyarlı.
+`pos_weight` pozitif örnekleri bilinçli olarak yukarı ağırlıklandırdığı için olasılıklar
+prevalansın çok üstüne kayıyor:
+
+| Sınıf | Prevalans | Ortalama tahmin | Prevalansın üstündeki örnek |
+|---|---|---|---|
+| Cardiomegaly | 0.0284 | 0.2646 | %100.0 |
+| Emphysema | 0.0271 | 0.2538 | %100.0 |
+| Pneumothorax | 0.0479 | 0.3234 | %99.9 |
+
+Düşük `p_t` değerlerinde model neredeyse tüm kohortu işaretliyor ve "treat all" ile
+aynileşiyor — AUC 0.90 olsa bile net fayda sıfır.
+
+**Kalibrasyondan sonra** (izotonik regresyon, **yalnızca validation setinde** eğitildi —
+test setine hiç bakılmadı):
+
+| Sınıf | Prevalans | Kalibre net fayda (maks) | Faydalı p_t aralığı |
+|---|---|---|---|
+| No Finding | 0.5407 | 0.2502 | 0.167 – 0.700 |
+| Infiltration | 0.1773 | 0.0577 | 0.051 – 0.437 |
+| Effusion | 0.1168 | 0.0709 | 0.012 – 0.700 |
+| Atelectasis | 0.1008 | 0.0490 | 0.015 – 0.504 |
+| Nodule | 0.0561 | 0.0231 | 0.019 – 0.407 |
+| Pneumothorax | 0.0479 | 0.0303 | 0.006 – 0.397 |
+| Consolidation | 0.0442 | 0.0211 | 0.010 – 0.155 |
+| Mass | 0.0436 | 0.0234 | 0.009 – 0.472 |
+| Pleural Thickening | 0.0307 | 0.0150 | 0.011 – 0.192 |
+| Cardiomegaly | 0.0284 | 0.0190 | 0.005 – 0.449 |
+| Emphysema | 0.0271 | 0.0192 | 0.004 – 0.483 |
+| Edema | 0.0191 | 0.0122 | 0.003 – 0.150 |
+| Fibrosis | 0.0159 | 0.0072 | 0.006 – 0.099 |
+| Pneumonia | 0.0120 | 0.0049 | 0.006 – 0.040 |
+| Hernia | 0.0019 | 0.0010 | — |
+
+> İzotonik kalibratör **monoton** olduğu için sıralamayı değiştirmez — yukarıdaki tüm
+> AUC değerleri bu adımdan etkilenmez. Değişen tek şey, sayıların üzerine karar
+> verilip verilemeyeceğidir.
+
+**Pratik sonuç:** bu sınıflandırıcı ham sigmoid çıktılarıyla dağıtılmamalıdır;
+ayrı bir veri üzerinde tahmin edilmiş kalibrasyon adımı, klinik faydanın
+isteğe bağlı bir iyileştirmesi değil **ön koşuludur**.
+
+Ham veriler: `egitim-ciktilari/decision_curve_analysis.csv`,
+`fig_decision_curves.png` (4 temsilci sınıf), `decision_curves.png` (15 sınıf).
+
 ### Eğitim Detayları
 
 - **Veri Seti**: NIH Chest X-ray Dataset (112,120 görüntü)
@@ -178,6 +241,12 @@ Ham sonuçlar: `egitim-ciktilari/ablation_results.csv`
 - Macro F1: 0.2796 — nadir sınıflarda precision cezası
 - Validation setinde kalibre edilmiş eşiklerle **0.3640**'a çıkıyor
   (`06_calibration_and_thresholds.py`)
+
+⚠️ **Ham olasılıklar kalibre DEĞİL — dağıtımdan önce kalibrasyon şart**:
+- `pos_weight` olasılıkları prevalansın çok üstüne kaydırıyor
+- Decision-curve analysis: ham çıktılarla 15 sınıfın sadece 1'inde net fayda var,
+  kalibrasyondan sonra 14'ünde var (`13_decision_curve_analysis.py`)
+- Sıralama (AUC) etkilenmiyor; etkilenen, sayıların üzerine karar verilebilirliği
 
 ⚠️ **Class Imbalance**:
 - Hernia: Sadece 227 örnek (%0.2)
@@ -572,6 +641,7 @@ python 06_calibration_and_thresholds.py --predictions test_predictions.csv      
 python 07_model_profiling.py --output-dir results/
 python 08_gradcam_visualization.py --checkpoint best_model.pth --test-csv test_112k.csv        --img-dir <nih-images> --output-dir results/gradcam/
 python 09_tta_significance_test.py
+python 13_decision_curve_analysis.py --predictions test_predictions.csv        --calibration-source val_predictions.csv --output-dir results/
 python run_ablations.py --presets full_model image_only metadata_only concat_no_gating        self_attention_fusion naive_class_weights no_focal_loss no_augmentation
 ```
 
@@ -580,9 +650,12 @@ python run_ablations.py --presets full_model image_only metadata_only concat_no_
 - `07` — parametre / FLOPs / bellek / gecikme profili (DenseNet-121 karşılaştırması dahil)
 - `08` — Grad-CAM ısı haritaları (hasta-özel görsel kanıt)
 - `09` — TTA için paired bootstrap anlamlılık testi
+- `13` — **decision-curve analysis**: net faydayı "herkesi tedavi et" / "kimseyi tedavi etme"
+  varsayılan stratejilerine karşı ölçer; hem ham hem validation'da kalibre edilmiş olasılıklarla
 - `run_ablations.py` — 8 konfigürasyonluk kontrollü ablation (hepsi aynı 10-epoch bütçesinde);
   oturumlar arası sonuçları **birleştirir**, test değerlendirmesini diskteki en iyi checkpoint'ten yapar
 - `10` / `11` — makale figürleri (mimari şeması, PR+kalibrasyon paneli, Grad-CAM paneli)
+- `12` — revize makale Word dosyasını üreten build script'i (orijinali değiştirmez, kopya üzerinde çalışır)
 
 ### 🔬 Yeniden Üretilebilirlik — Makale Tablo/Figür Eşlemesi
 
@@ -596,8 +669,9 @@ python run_ablations.py --presets full_model image_only metadata_only concat_no_
 | Tablo 6 (hesaplama profili) | `07_model_profiling.py` | — |
 | Fig 2 (mimari) | `10_architecture_figure.py` | `egitim-ciktilari/fig2_architecture.png` |
 | Fig 6 (PR + kalibrasyon) | `06` + `11_composite_figures.py` | `egitim-ciktilari/fig6_pr_calibration.png` |
-| Fig 7 (Grad-CAM) | `08` + `11_composite_figures.py` | `egitim-ciktilari/fig7_gradcam_panel.png` |
-| Fig 8 / 9 (ROC, confusion) | `05_evaluate.py` | `egitim-ciktilari/roc_curves.png`, `confusion_matrices.png` |
+| Fig 7 (decision curves) | `13_decision_curve_analysis.py` | `egitim-ciktilari/fig_decision_curves.png`, `decision_curve_analysis.csv` |
+| Fig 8 (Grad-CAM) | `08` + `11_composite_figures.py` | `egitim-ciktilari/fig7_gradcam_panel.png` |
+| Fig 9 / 10 (ROC, confusion) | `05_evaluate.py` | `egitim-ciktilari/roc_curves.png`, `confusion_matrices.png` |
 
 Ham tahmin dosyaları (`test_predictions.csv`, `test_predictions_tta.csv`,
 `val_predictions.csv`) da paylaşılmıştır; tüm metrikler ve güven aralıkları
@@ -904,8 +978,10 @@ kds_project/
 │   ├── 01_data_preparation.py    # Patient-level split + manifest
 │   ├── 04_train.py               # Eğitim döngüsü
 │   ├── 05_evaluate*.py           # Değerlendirme (+ TTA)
-│   ├── 06..09_*.py               # Kalibrasyon, profiling, Grad-CAM, anlamlılık
+│   ├── 06..09_*.py               # Kalibrasyon, profiling, Grad-CAM, TTA anlamlılık
+│   ├── 13_decision_curve_*.py    # Decision-curve analysis (net fayda)
 │   ├── 10,11_*.py                # Makale figürleri
+│   ├── 12_build_revised_docx.py  # Makale Word çıktısı
 │   └── run_ablations.py          # Kontrollü ablation sürücüsü
 │
 ├── egitim-ciktilari/             # Eğitim çıktıları (metrikler, tahminler, figürler)
@@ -1118,6 +1194,8 @@ CORS_ALLOWED_ORIGINS = [
 
 **Performans Uyarısı**: Model performansı kullanılan görüntü kalitesine, çekim tekniğine ve hasta popülasyonuna bağlı olarak değişebilir. External validation yapılmamıştır.
 
+**Kalibrasyon Uyarısı**: Modelin ham sigmoid çıktıları kalibre edilmemiştir ve prevalansın çok üstünde değerler üretir. Decision-curve analysis, ham çıktılarla 15 sınıfın yalnızca 1'inde varsayılan stratejilere göre net fayda olduğunu göstermektedir (kalibrasyondan sonra 14'ünde). Herhangi bir klinik kullanım öncesinde, ayrı bir veri seti üzerinde tahmin edilmiş kalibrasyon adımı zorunludur.
+
 ## 📝 Lisans
 
 Bu depodaki kod **MIT Lisansı** altında dağıtılmaktadır — bkz. [`LICENSE`](LICENSE).
@@ -1163,7 +1241,8 @@ materyalidir. Kullanıyorsanız lütfen ilgili makaleye atıf verin.
 ---
 
 **Son Güncelleme**: 11 Eylül 2026
-**Versiyon**: 2.0.0 — hakem revizyonu sürümü (düzeltilmiş class-weight ile yeniden eğitim,
-eşik kalibrasyonu, 8 konfigürasyonluk ablation, Grad-CAM, hesaplama profili)
+**Versiyon**: 2.1.0 — hakem revizyonu sürümü (düzeltilmiş class-weight ile yeniden eğitim,
+eşik kalibrasyonu, 8 konfigürasyonluk epoch-eşleşmeli ablation, Grad-CAM, hesaplama profili,
+decision-curve analysis)
 **Geliştirici**: KDS Ekibi
 
