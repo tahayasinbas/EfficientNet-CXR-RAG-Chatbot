@@ -603,10 +603,11 @@ Ham tahmin dosyaları (`test_predictions.csv`, `test_predictions_tta.csv`,
 `val_predictions.csv`) da paylaşılmıştır; tüm metrikler ve güven aralıkları
 bunlardan bağımsız olarak yeniden hesaplanabilir.
 
-> ℹ️ **`model/` klasörü hakkında:** o klasör web servisinin çıkarım anlık
-> görüntüsüdür ve eski hiperparametre değerleri içerebilir. **Makaledeki tüm
-> eğitim ve değerlendirme sonuçları `egitim-dosyalari/` altındaki kodla
-> üretilmiştir** — referans alınması gereken kaynak orasıdır.
+> ℹ️ **Tek kaynak ilkesi:** Daha önce ayrı bir `model/` klasöründe tutulan
+> çıkarım kopyası kaldırılmıştır. Hem eğitim hem de web servisi artık
+> **`egitim-dosyalari/config.py` ve `egitim-dosyalari/model.py`** dosyalarını
+> kullanır; böylece dağıtılan model ile makalede tarif edilen model
+> tanımı arasında hiçbir sapma olamaz.
 
 ### Konfigürasyon
 
@@ -896,8 +897,22 @@ kds_project/
 │   ├── urls.py                   # URL routing
 │   └── services.py               # RAG chatbot servisi ⭐
 │
-├── model/                        # ML model dosyaları
-│   └── model.weights.h5          # EfficientNet-B3 weights (294MB)
+├── egitim-dosyalari/             # Eğitim + değerlendirme kodu (TEK KAYNAK) ⭐
+│   ├── config.py                 # Tüm hiperparametreler
+│   ├── model.py                  # MultimodalChestXrayModel + füzyon modülleri
+│   ├── dataset.py                # Veri yükleme + augmentation + demografik kodlama
+│   ├── 01_data_preparation.py    # Patient-level split + manifest
+│   ├── 04_train.py               # Eğitim döngüsü
+│   ├── 05_evaluate*.py           # Değerlendirme (+ TTA)
+│   ├── 06..09_*.py               # Kalibrasyon, profiling, Grad-CAM, anlamlılık
+│   ├── 10,11_*.py                # Makale figürleri
+│   └── run_ablations.py          # Kontrollü ablation sürücüsü
+│
+├── egitim-ciktilari/             # Eğitim çıktıları (metrikler, tahminler, figürler)
+│   ├── split_manifest_112k.json  # Bölüm başına görüntü/hasta sayıları
+│   ├── test_metrics*.csv         # Sınıf başına metrikler (± TTA)
+│   ├── ablation_results.csv      # 8 konfigürasyonluk ablation
+│   └── *_predictions.csv         # Örnek bazlı ham tahminler
 │
 ├── media/                        # Yüklenen dosyalar
 │   └── xrays/                    # X-ray görüntüleri
@@ -1053,12 +1068,15 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  # CPU kullan
 
 **Hata:**
 ```
-FileNotFoundError: model.weights.h5
+FileNotFoundError: best_model.pth
 ```
 
 **Çözüm:**
-- Model dosyasının `model/model.weights.h5` konumunda olduğundan emin olun
-- Model dosyasını indirin ve doğru konuma yerleştirin
+- Eğitilmiş ağırlıklar (`best_model.pth`, ~149 MB) GitHub'ın dosya boyutu
+  sınırını aştığı için bu depoda **bulunmaz**.
+- Ağırlıkları ayrı arşivden indirip proje kökünde `models/best_model.pth`
+  konumuna yerleştirin, ya da `04_train.py` ile yeniden eğitin.
+- Model tanımı ve hiperparametreler `egitim-dosyalari/` altındadır.
 
 ### 6. Frontend CORS Hatası
 
