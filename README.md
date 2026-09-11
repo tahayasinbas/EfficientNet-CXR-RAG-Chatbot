@@ -7,7 +7,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)](https://www.postgresql.org/)
 [![License](https://img.shields.io/badge/License-Educational-yellow.svg)](LICENSE.md)
 
-Göğüs röntgeni görüntülerini yapay zeka ile analiz eden ve tıbbi doküman tabanlı RAG (Retrieval-Augmented Generation) chatbot sistemi içeren web uygulaması. NIH Chest X-ray Dataset üzerinde eğitilmiş EfficientNet-B3 modeli ile 15 farklı hastalığın tespitini yapar (Macro AUC: 0.82+).
+Göğüs röntgeni görüntülerini yapay zeka ile analiz eden ve tıbbi doküman tabanlı RAG (Retrieval-Augmented Generation) chatbot sistemi içeren web uygulaması. NIH Chest X-ray Dataset üzerinde eğitilmiş EfficientNet-B3 modeli ile 15 farklı hastalığın tespitini yapar (Macro AUC: 0.8342, TTA ile, 15 sınıf).
 
 ## 📋 İçindekiler
 
@@ -39,7 +39,7 @@ Göğüs röntgeni görüntülerini yapay zeka ile analiz eden ve tıbbi doküma
 - **Göğüs röntgeni yükleme**: Çoklu format desteği (PNG, JPG, JPEG, DICOM)
 - **AI Tabanlı Analiz**: EfficientNet-B3 tabanlı derin öğrenme modeli
 - **Multi-label Sınıflandırma**: Bir görüntüde birden fazla hastalığın eş zamanlı tespiti
-- **15 Hastalık Tespiti**: NIH Chest X-ray veri seti üzerinde eğitilmiş (Macro AUC: 0.82+)
+- **15 Hastalık Tespiti**: NIH Chest X-ray veri seti üzerinde eğitilmiş (Macro AUC: 0.8342, TTA ile)
   - **No Finding** (Normal), **Infiltration** (İnfiltrasyon)
   - **Effusion** (Efüzyon/Sıvı Birikimi), **Atelectasis** (Atelektazi)
   - **Nodule** (Nodül), **Mass** (Kitle)
@@ -74,16 +74,58 @@ Göğüs röntgeni görüntülerini yapay zeka ile analiz eden ve tıbbi doküma
 
 ### Test Seti Sonuçları (17,448 görüntü)
 
-| Hastalık | AUC | Precision | Recall | F1-Score |
-|----------|-----|-----------|--------|----------|
-| **Emphysema** | 0.935 | 0.396 | 0.659 | 0.495 |
-| **Cardiomegaly** | 0.910 | 0.318 | 0.579 | 0.411 |
-| **Edema** | 0.886 | 0.140 | 0.455 | 0.214 |
-| **Pneumothorax** | 0.884 | 0.340 | 0.522 | 0.412 |
-| **Hernia** | 0.868 | 0.215 | 0.412 | 0.283 |
-| **Effusion** | 0.856 | 0.818 | 0.004 | 0.009 |
-| **Mass** | 0.834 | 0.347 | 0.328 | 0.337 |
-| **Macro Average** | **0.820** | - | - | **0.177** |
+| Hastalık | AUC | AP | Precision | Recall (Sens.) | F1 | Destek |
+|----------|-----|-----|-----------|----------------|-----|--------|
+| **Emphysema** | 0.9258 | 0.4084 | 0.2565 | 0.7564 | 0.3830 | 472 |
+| **Cardiomegaly** | 0.9033 | 0.3229 | 0.1940 | 0.7440 | 0.3078 | 496 |
+| **Pneumothorax** | 0.8952 | 0.3363 | 0.2285 | 0.7760 | 0.3530 | 835 |
+| **Edema** | 0.8913 | 0.1717 | 0.0837 | 0.7994 | 0.1516 | 334 |
+| **Effusion** | 0.8779 | 0.5162 | 0.2610 | 0.9004 | 0.4047 | 2,038 |
+| **Mass** | 0.8510 | 0.3004 | 0.1573 | 0.7211 | 0.2582 | 760 |
+| **Hernia** | 0.8491 | 0.2171 | 0.1009 | 0.3235 | 0.1538 | 34 |
+| **Atelectasis** | 0.8188 | 0.3622 | 0.1966 | 0.8595 | 0.3200 | 1,758 |
+| **Fibrosis** | 0.8032 | 0.0956 | 0.0783 | 0.4585 | 0.1337 | 277 |
+| **Pleural Thickening** | 0.8009 | 0.1443 | 0.1028 | 0.6250 | 0.1766 | 536 |
+| **Consolidation** | 0.7974 | 0.1366 | 0.1056 | 0.7938 | 0.1864 | 771 |
+| **No Finding** | 0.7875 | 0.8028 | 0.7842 | 0.6785 | 0.7276 | 9,434 |
+| **Nodule** | 0.7780 | 0.2514 | 0.1240 | 0.7038 | 0.2109 | 979 |
+| **Pneumonia** | 0.7705 | 0.0437 | 0.0479 | 0.4190 | 0.0859 | 210 |
+| **Infiltration** | 0.7144 | 0.3560 | 0.2102 | 0.9062 | 0.3412 | 3,093 |
+| **Macro Average** | **0.8309** | **0.2977** | — | **0.6977** | **0.2796** | — |
+| **Macro Average (+TTA)** | **0.8342** | **0.3016** | — | **0.7001** | **0.2817** | — |
+
+> **Not:** Yukarıdaki değerler varsayılan eşik τ = 0.5 içindir. Sınıf başına eşikler
+> **yalnızca validation seti üzerinde** kalibre edildiğinde (Youden's J) macro
+> sensitivity 0.6977 → **0.7662**, F1-maksimize eden eşikle macro F1 0.2796 →
+> **0.3640** olur. Tam tablo: `egitim-ciktilari/threshold_optimized_metrics.csv`
+> (üreten script: `06_calibration_and_thresholds.py`).
+
+### Kontrollü Ablation (8 konfigürasyon)
+
+Hepsi **aynı** patient-level split, ön işleme, optimizer, seed ve **10-epoch bütçesiyle** eğitildi;
+yalnızca satırda belirtilen faktör değişiyor (`run_ablations.py`).
+
+| Konfigürasyon | Test macro AUC | Test macro F1 | Test macro Sens. |
+|---|---|---|---|
+| **Önerilen model (gating)** | 0.8323 | 0.2740 | 0.6957 |
+| Sadece görüntü | 0.8307 | 0.2801 | 0.6915 |
+| Sadece demografik | 0.6124 | 0.1219 | 0.5229 |
+| Basit birleştirme (concat) | 0.8320 | 0.2707 | 0.6891 |
+| Çoklu-baş self-attention | 0.8119 | 0.2334 | 0.6848 |
+| Naive class weight (eski formül) | 0.8112 | 0.1431 | 0.1920 |
+| Focal loss kapalı (düz BCE) | 0.8257 | 0.3026 | 0.6073 |
+| Augmentation kapalı | 0.8193 | 0.2660 | 0.6863 |
+| *Önerilen model (18 epoch, referans)* | *0.8309* | *0.2796* | *0.6977* |
+
+**Gürültü tabanı:** Aynı konfigürasyon 10 epoch'ta 0.8323, 18 epoch'ta 0.8309 veriyor —
+hiçbir şey değişmeden **0.0014** fark. Tek-seed'li koşumların oynaklığı bu mertebede, dolayısıyla:
+
+- gating (0.8323) vs concat (0.8320) → **+0.0003**, gürültünün altında → füzyon mekanizması seçimi ölçülemiyor
+- tam model (0.8323) vs sadece görüntü (0.8307) → **+0.0016**, gürültüyle aynı mertebede → demografik katkı iddia edilmiyor
+- sadece demografik (0.6124) vs sadece görüntü (0.8307) → **0.2183**, ~150× → sinyal radyografiden geliyor, demografik kısayoldan değil
+- naive class weight → sensitivity **0.6957 → 0.1920** (3.6× düşüş), AUC ise büyük ölçüde korunuyor
+
+Ham sonuçlar: `egitim-ciktilari/ablation_results.csv`
 
 ### Eğitim Detayları
 
@@ -91,21 +133,23 @@ Göğüs röntgeni görüntülerini yapay zeka ile analiz eden ve tıbbi doküma
 - **Train/Val/Test Split**: 70%/15%/15% (Patient-level split)
 - **Model**: EfficientNet-B3 (12M parametreler)
 - **Görüntü Boyutu**: 300×300 piksel
-- **Eğitim Platformu**: Kaggle (GPU: Tesla T4 x2)
-- **Eğitim Süresi**: 5.3 saat (18 epoch)
+- **Eğitim Platformu**: Kaggle (tek NVIDIA Tesla T4, 16 GB)
+- **Eğitim**: 18 epoch; en iyi validation macro-AUC epoch 12'de (0.8392), test sonuçları bu checkpoint'ten
 - **Batch Size**: 36
-- **Optimizasyon**: Adam optimizer + Cosine Annealing LR
-- **Loss Function**: Focal Loss + Class Weights
-- **Data Augmentation**: Medium (rotation, shift, scale, flip)
-- **Test-Time Augmentation (TTA)**: 5x augmentation (+0.0025 AUC artışı)
+- **Optimizasyon**: AdamW (lr 3e-4, weight decay 1e-4) + Cosine Annealing + warmup
+- **Karışık Hassasiyet**: float16 AMP (T4 native BF16 desteklemez) + dinamik loss scaling
+- **Loss Function**: Focal Loss (α=0.25, γ=2.0) + sınıf başına `pos_weight = N_neg/N_pos` (15'te sınırlı)
+- **Kararlılık**: Gradient clipping (max_norm=5.0) + NaN-loss batch atlama
+- **Data Augmentation**: Medium (rotation, shift, scale, flip, CLAHE, gauss noise, coarse dropout)
+- **Test-Time Augmentation (TTA)**: 5x augmentation, **+0.0032 macro AUC** (paired bootstrap %95 CI [+0.0025, +0.0039], 15/15 sınıfta iyileşme)
 
 ### Güçlü Yönler
 
 ✅ **Yüksek Performans**:
-- Emphysema: AUC 0.935
-- Cardiomegaly: AUC 0.910
-- Pneumothorax: AUC 0.884
-- Edema: AUC 0.886
+- Emphysema: AUC 0.9258
+- Cardiomegaly: AUC 0.9033
+- Pneumothorax: AUC 0.8952
+- Edema: AUC 0.8913
 
 ✅ **Data Leakage Önleme**:
 - Patient-level split ile güvenilir sonuçlar
@@ -117,18 +161,23 @@ Göğüs röntgeni görüntülerini yapay zeka ile analiz eden ve tıbbi doküma
 
 ✅ **Multimodal Approach**:
 - Görüntü + demografik bilgiler
-- Attention mechanism ile modalite ağırlıklandırma
+- Öğrenilmiş **modalite kapılama** (modality gating) ile modalite ağırlıklandırma
+
+✅ **Kontrollü Ablation** (8 konfigürasyon, hepsi 10 epoch, `run_ablations.py`):
+- Sinyalin radyografik içerikten geldiği kanıtlandı (metadata-only 0.6124 vs image-only 0.8307)
+- Sonuçlar: `egitim-ciktilari/ablation_results.csv`
 
 ### İyileştirme Alanları
 
 ⚠️ **Düşük Performanslı Hastalıklar**:
-- Infiltration: AUC 0.690 (veri belirsizliği)
-- Pneumonia: AUC 0.761 (az örnek sayısı)
-- Nodule: AUC 0.730 (küçük lezyon tespiti zor)
+- Infiltration: AUC 0.7144 (etiket gürültüsü)
+- Pneumonia: AUC 0.7705 (az örnek sayısı)
+- Nodule: AUC 0.7780 (küçük lezyon, 300×300 çözünürlükte zor)
 
-⚠️ **F1-Score Düşük**:
-- Macro F1: 0.177 (precision-recall trade-off)
-- Threshold optimization gerekli
+⚠️ **F1-Score Düşük (τ = 0.5'te)**:
+- Macro F1: 0.2796 — nadir sınıflarda precision cezası
+- Validation setinde kalibre edilmiş eşiklerle **0.3640**'a çıkıyor
+  (`06_calibration_and_thresholds.py`)
 
 ⚠️ **Class Imbalance**:
 - Hernia: Sadece 227 örnek (%0.2)
@@ -174,7 +223,7 @@ Göğüs röntgeni görüntülerini yapay zeka ile analiz eden ve tıbbi doküma
 │  └────────┬─────────┘         └─────────┬────────┘          │
 │           │                             │                   │
 │           │    ┌───────────────────┐   │                    │
-│           └────┤ Attention Fusion  ├───┘                    │
+│           └────┤ Modality Gating   ├───┘                    │
 │                └─────────┬─────────┘                        │
 │                          │                                  │
 │                ┌─────────▼─────────┐                        │
@@ -198,17 +247,30 @@ Göğüs röntgeni görüntülerini yapay zeka ile analiz eden ve tıbbi doküma
 - Backbone freeze: İlk 2 epoch
 
 **Demographic Encoder**:
-- 12 demografik özellik:
-  - Yaş özellikleri (4): normalized, log, squared, age_bins
+- 12 demografik özellik (3 + 4 + 2 + 3 = 12):
+  - Sürekli yaş dönüşümleri (3): min-max (age/100), log (log(1+age)/log(101)), karesel ((age/100)²)
+  - Yaş bantları (4): <18, 18-44, 45-64, ≥65 (birbirini dışlayan one-hot)
   - Cinsiyet (2): Male/Female (one-hot)
   - Görüntü pozisyonu (3): PA/AP/Other (one-hot)
-  - Yaş grupları (4): <18, 18-45, 45-65, 65+ (one-hot)
-- 3-layer MLP (12→128→128→64)
-- Batch normalization + Dropout
+- Eksik/geçersiz değer yönetimi: yaş [0, 120] aralığına clip + eksikse ortalama ile doldurma;
+  tanınmayan cinsiyet/pozisyon değerleri ilgili one-hot bloğunda tamamen sıfır ("bilinmeyen")
+- 3-layer MLP (12→128→128→64), her katmanda BatchNorm + ReLU + Dropout (0.30 / 0.25 / 0.20)
 
-**Attention Fusion**:
-- Görüntü ve demografik özellikleri için öğrenilebilir attention weights
-- Modelin hangi modaliteye daha çok odaklanacağını dinamik olarak seçmesi
+**Modality Gating Fusion** (`ModalityGatingFusion`):
+- Bu mekanizma **self-attention DEĞİLDİR** — token dizisi oluşturmaz, Q/K/V projeksiyonu hesaplamaz.
+  Birleştirilmiş vektör üzerinden **modalite başına bir skaler** üreten öğrenilmiş bir softmax kapısıdır:
+
+  ```
+  z    = [z_image ; z_demo]              ∈ ℝ¹⁶⁰⁰
+  h    = ReLU(W₁ z + b₁),  W₁ ∈ ℝ⁴⁰⁰ˣ¹⁶⁰⁰
+  [a_image, a_demo] = softmax(W₂ h + b₂),  W₂ ∈ ℝ²ˣ⁴⁰⁰,  a_image + a_demo = 1
+  z_fused = [a_image · z_image ; a_demo · z_demo]  ∈ ℝ¹⁶⁰⁰
+  ```
+- Her modalite bloğu, girdiye bağlı tek bir skalerle ölçeklenip birleştirilir.
+- Karşılaştırma için **gerçek** çoklu-baş self-attention (`CrossModalSelfAttention`:
+  2 modalite token'ı → 256 boyut, 4 head, residual + LayerNorm → 512 boyut) da
+  uygulandı ve ablation'da değerlendirildi; `config.FUSION_TYPE` ile seçilir
+  (`'gating'` | `'self_attention'` | `'concat'`).
 
 **Fusion Network**:
 - 3-layer deep MLP (1600→512→256→128)
@@ -467,8 +529,11 @@ Model, Kaggle platformunda Tesla T4 GPU kullanılarak eğitilmiştir. Eğitim ç
 python 01_data_preparation.py
 ```
 - 112,120 görüntünün analizi
-- Patient-level stratified split (70/15/15)
-- Multi-label distribution kontrolü
+- **Patient-level** split (`GroupShuffleSplit`, grup anahtarı = hasta kimliği, seed 42), hedef 70/15/15
+- **Not:** Sınıf-stratifikasyonu uygulanmaz — çok-etiketli bir problemde hasta-düzeyi gruplama ile
+  stratifikasyon aynı anda zorlanamaz. Gerçekleşen bölünme: 78,566 / 16,106 / 17,448 görüntü
+  (21,563 / 4,621 / 4,621 hasta), hasta örtüşmesi programatik olarak sıfır doğrulandı.
+- `split_manifest_112k.json` üretimi (bölüm başına tam görüntü/hasta sayıları + sınıf prevalansları)
 - CSV dosyaları oluşturma (train/val/test)
 
 #### 2. Model Eğitimi (`04_train.py`)
@@ -495,9 +560,53 @@ python 05_evaluate.py
 ```bash
 python 05_evaluate_with_tta.py
 ```
-- 5x augmentation ile tahmin
+- 5x augmentation ile tahmin (orijinal, yatay çevirme, ±5° rastgele döndürme, sabit −5° döndürme, hafif parlaklık/kontrast)
 - Ensemble averaging
-- +0.0025 AUC improvement
+- **+0.0032 macro AUC** (0.8309 → 0.8342); paired bootstrap %95 CI [+0.0025, +0.0039], 15/15 sınıfta iyileşme
+- Per-sample çıktı: `test_predictions_tta.csv` (anlamlılık testi: `09_tta_significance_test.py`)
+
+#### 5. Analiz ve Hakem-Yanıtı Script'leri
+
+```bash
+python 06_calibration_and_thresholds.py --predictions test_predictions.csv        --threshold-source val_predictions.csv --output-dir results/
+python 07_model_profiling.py --output-dir results/
+python 08_gradcam_visualization.py --checkpoint best_model.pth --test-csv test_112k.csv        --img-dir <nih-images> --output-dir results/gradcam/
+python 09_tta_significance_test.py
+python run_ablations.py --presets full_model image_only metadata_only concat_no_gating        self_attention_fusion naive_class_weights no_focal_loss no_augmentation
+```
+
+- `06` — sınıf başına eşik kalibrasyonu (**yalnızca validation setinde**), PR eğrileri,
+  reliability diyagramları, Brier skorları, bootstrap %95 CI
+- `07` — parametre / FLOPs / bellek / gecikme profili (DenseNet-121 karşılaştırması dahil)
+- `08` — Grad-CAM ısı haritaları (hasta-özel görsel kanıt)
+- `09` — TTA için paired bootstrap anlamlılık testi
+- `run_ablations.py` — 8 konfigürasyonluk kontrollü ablation (hepsi aynı 10-epoch bütçesinde);
+  oturumlar arası sonuçları **birleştirir**, test değerlendirmesini diskteki en iyi checkpoint'ten yapar
+- `10` / `11` — makale figürleri (mimari şeması, PR+kalibrasyon paneli, Grad-CAM paneli)
+
+### 🔬 Yeniden Üretilebilirlik — Makale Tablo/Figür Eşlemesi
+
+| Makale öğesi | Üreten script | Çıktı dosyası |
+|---|---|---|
+| Tablo 1 (split istatistikleri) | `01_data_preparation.py` | `egitim-ciktilari/split_manifest_112k.json` |
+| Tablo 2 (sınıf başına performans) | `05_evaluate.py` | `egitim-ciktilari/test_metrics.csv` |
+| Tablo 3 (eşik kalibrasyonu) | `06_calibration_and_thresholds.py` | `egitim-ciktilari/threshold_optimized_metrics.csv`, `report.md` |
+| Tablo 4 (TTA etkisi) | `05_evaluate_with_tta.py` + `09_tta_significance_test.py` | `egitim-ciktilari/test_metrics_tta.csv` |
+| Tablo 5 (ablation) | `run_ablations.py` | `egitim-ciktilari/ablation_results.csv` |
+| Tablo 6 (hesaplama profili) | `07_model_profiling.py` | — |
+| Fig 2 (mimari) | `10_architecture_figure.py` | `egitim-ciktilari/fig2_architecture.png` |
+| Fig 6 (PR + kalibrasyon) | `06` + `11_composite_figures.py` | `egitim-ciktilari/fig6_pr_calibration.png` |
+| Fig 7 (Grad-CAM) | `08` + `11_composite_figures.py` | `egitim-ciktilari/fig7_gradcam_panel.png` |
+| Fig 8 / 9 (ROC, confusion) | `05_evaluate.py` | `egitim-ciktilari/roc_curves.png`, `confusion_matrices.png` |
+
+Ham tahmin dosyaları (`test_predictions.csv`, `test_predictions_tta.csv`,
+`val_predictions.csv`) da paylaşılmıştır; tüm metrikler ve güven aralıkları
+bunlardan bağımsız olarak yeniden hesaplanabilir.
+
+> ℹ️ **`model/` klasörü hakkında:** o klasör web servisinin çıkarım anlık
+> görüntüsüdür ve eski hiperparametre değerleri içerebilir. **Makaledeki tüm
+> eğitim ve değerlendirme sonuçları `egitim-dosyalari/` altındaki kodla
+> üretilmiştir** — referans alınması gereken kaynak orasıdır.
 
 ### Konfigürasyon
 
@@ -508,30 +617,49 @@ IMG_SIZE = 300
 BATCH_SIZE = 36
 EPOCHS = 18
 LEARNING_RATE = 0.0003
+WEIGHT_DECAY = 0.0001
 DROPOUT_RATE = 0.55
 PRETRAINED_MODEL = "efficientnet_b3"
 FREEZE_BACKBONE_EPOCHS = 2
+EARLY_STOP_PATIENCE = 9
 USE_FOCAL_LOSS = True
-USE_CLASS_WEIGHTS = True
+FOCAL_LOSS_ALPHA = 0.25
+FOCAL_LOSS_GAMMA = 2.0
 AUGMENTATION_STRENGTH = 'medium'
+RANDOM_SEED = 42
+
+AMP_DTYPE = torch.float16      # T4 native BF16 Tensor Core DESTEKLEMEZ
+CLASS_WEIGHT_SCHEME = 'corrected'   # pos_weight = N_neg/N_pos, 15'te sınırlı
+                                    # ('naive' = eski hatalı formül, ablation için saklandı)
+FUSION_TYPE = 'gating'         # 'gating' | 'self_attention' | 'concat'
+ABLATION_MODE = 'full'         # 'full' | 'image_only' | 'metadata_only'
+ABLATION_EPOCHS = 10
 ```
+
+> **Class weight düzeltmesi (önemli):** Önceki sürüm her sınıfın sayısını *tüm
+> sınıfların toplamına* bölüyordu; bu, çoğunluk sınıfları için `pos_weight < 1`
+> üretiyordu (ör. "No Finding" = 0.157) ve BCEWithLogitsLoss'ta pozitif tahminleri
+> caydırarak τ = 0.5'te sensitivity/F1'i sıfıra düşürüyordu. Standart
+> `N_negatif / N_pozitif` formülüne geçildi (15× sınır). Kontrollü ablation bunu
+> doğruluyor: `naive_class_weights` preset'inde macro sensitivity 0.6957 → **0.1920**
+> çöküyor, AUC ise büyük ölçüde korunuyor — yani arıza yalnızca AUC'ye bakınca
+> görünmüyor. Eski formül `NAIVE_CLASS_WEIGHTS` olarak bilinçli saklandı.
 
 ### Eğitim Süreçleri
 
-**Epoch İlerlemesi**:
+**Seçilen Checkpoint** (`best_model.pth` metadata'sından):
 ```
-Epoch 1/18 - Val AUC: 0.6870
-Epoch 5/18 - Val AUC: 0.7917
-Epoch 10/18 - Val AUC: 0.8170
-Epoch 18/18 - Val AUC: 0.8231 ⭐ Best
+Epoch 12/18 — Val macro AUC: 0.8392  ⭐ Best  (early stopping tetiklenmedi)
+  Train loss 0.0845  |  Train macro AUC 0.8450
+  Val   loss 0.0871  |  Val   macro AUC 0.8392
+  Train–Val AUC farkı: 0.006  → overfitting kontrol altında
 ```
+Tüm test sonuçları bu checkpoint'ten üretilmiştir, son epoch ağırlıklarından değil.
 
-**Süre Dağılımı**:
-- Veri hazırlama: ~6 dakika
-- Eğitim: 5.3 saat (18 epoch)
-- Değerlendirme: ~3 dakika
-- TTA: ~35 dakika
-- **Toplam**: ~6.2 saat
+> ⚠️ **`egitim-ciktilari/kaggle-ciktisi.txt` hakkında:** bu dosya **önceki**
+> (hatalı class-weight formüllü) koşumun tam logudur ve bilinçli olarak
+> saklanmıştır — düzeltilen hatanın kanıtıdır. Bu klasördeki güncel
+> `best_model.pth` / `test_metrics*.csv` dosyalarını **tarif etmez**.
 
 ## 📡 API Endpoints
 
@@ -974,7 +1102,13 @@ CORS_ALLOWED_ORIGINS = [
 
 ## 📝 Lisans
 
-Bu proje eğitim amaçlıdır. Ticari kullanım için lütfen lisans alın.
+Bu depodaki kod **MIT Lisansı** altında dağıtılmaktadır — bkz. [`LICENSE`](LICENSE).
+
+NIH ChestX-ray14 veri seti ve eğitilmiş model ağırlıkları bu lisansın kapsamı
+dışındadır; veri seti NIH Clinical Center'ın kendi kullanım şartlarına tabidir.
+
+**Akademik kullanım:** Bu depo bir dergi makalesinin yeniden üretilebilirlik
+materyalidir. Kullanıyorsanız lütfen ilgili makaleye atıf verin.
 
 ## 👥 Katkıda Bulunma
 
@@ -1010,7 +1144,8 @@ Bu proje eğitim amaçlıdır. Ticari kullanım için lütfen lisans alın.
 
 ---
 
-**Son Güncelleme**: 25 Aralık 2025
-**Versiyon**: 1.0.0
+**Son Güncelleme**: 11 Eylül 2026
+**Versiyon**: 2.0.0 — hakem revizyonu sürümü (düzeltilmiş class-weight ile yeniden eğitim,
+eşik kalibrasyonu, 8 konfigürasyonluk ablation, Grad-CAM, hesaplama profili)
 **Geliştirici**: KDS Ekibi
 
