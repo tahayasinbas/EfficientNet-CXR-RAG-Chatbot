@@ -657,6 +657,19 @@ python run_ablations.py --presets full_model image_only metadata_only concat_no_
 - `10` / `11` — makale figürleri (mimari şeması, PR+kalibrasyon paneli, Grad-CAM paneli)
 - `12` — revize makale Word dosyasını üreten build script'i (orijinali değiştirmez, kopya üzerinde çalışır)
 
+### 📦 Eğitim Kodunun Bağımlılıkları
+
+Kök dizindeki `requirements.txt` **web uygulaması** içindir. Eğitim ve analiz
+script'lerini çalıştırmak için ayrı bir dosya vardır:
+
+```bash
+pip install -r egitim-dosyalari/requirements.txt
+```
+
+Web uygulamasında bulunmayan ek paketler: `scikit-learn`, `pandas`, `matplotlib`,
+`seaborn`, `albumentations`, `thop` (FLOPs, opsiyonel), `python-docx` (makale
+çıktısı, opsiyonel). Hangi script'in neye ihtiyaç duyduğu dosyanın içinde listelidir.
+
 ### 🔬 Yeniden Üretilebilirlik — Makale Tablo/Figür Eşlemesi
 
 | Makale öğesi | Üreten script | Çıktı dosyası |
@@ -972,6 +985,7 @@ kds_project/
 │   └── services.py               # RAG chatbot servisi ⭐
 │
 ├── egitim-dosyalari/             # Eğitim + değerlendirme kodu (TEK KAYNAK) ⭐
+│   ├── requirements.txt          # Eğitim/analiz bağımlılıkları (web'den ayrı)
 │   ├── config.py                 # Tüm hiperparametreler
 │   ├── model.py                  # MultimodalChestXrayModel + füzyon modülleri
 │   ├── dataset.py                # Veri yükleme + augmentation + demografik kodlama
